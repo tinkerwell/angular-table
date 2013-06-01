@@ -1,10 +1,10 @@
 # angular-table
 
-A directive for creating sortable tables with pagination.
+Lets you declare tables with very little code. Enables sorting and pagination if required.
 
-# Examples
+## Examples
 
-## No sorting, no pagination
+### No sorting, no pagination
 
 ```html
   <table at-table list="list"> <!-- list references the list in scope you would like to render -->
@@ -51,7 +51,7 @@ A directive for creating sortable tables with pagination.
   </tbody>
 </table>
 
-## Enable sorting for any column
+### Enable sorting for any column
 
 ```html
   <table at-table class="table" list="list">
@@ -71,7 +71,7 @@ A directive for creating sortable tables with pagination.
   </table>
 ```
 
-## Add pagination
+### Add pagination
 
 ```html
   <!-- reference the pager defined below -->
