@@ -135,6 +135,6 @@ Simply provide custom `th` elements. You must declare `attribute` to address the
 
 ### Filtering
 
-This directive currently does not attempt to provide a mechanism for filtering. You can of course filter
-the list yourself. This will be reflected automatically by the table and the pagination, since we have a bi-directional
-binding.
+This directive does not attempt to provide a mechanism for filtering. You can of course filter
+the list yourself. This will be reflected automatically by the table and the pagination, since
+we have a bi-directional binding.
