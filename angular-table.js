@@ -13,7 +13,7 @@
           return "";
         }
       },
-      extractSortable: function(classes) {
+      isSortable: function(classes) {
         var sortable;
 
         sortable = /(sortable)/i.exec(classes);
@@ -34,42 +34,47 @@
 
   angular.module("angular-table").directive("atTable", [
     "attributeExtractor", function(attributeExtractor) {
-      var constructHeader;
+      var capitaliseFirstLetter, constructHeader;
 
+      capitaliseFirstLetter = function(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+      };
       constructHeader = function(element) {
         var attribute, existing_ths, icon, sortable, td, tds, th, thead, title, tr, width, _i, _j, _len, _len1, _ref;
 
         thead = element.find("thead");
-        tr = thead.find("tr");
-        existing_ths = {};
-        _ref = tr.find("th");
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          th = _ref[_i];
-          th = angular.element(th);
-          existing_ths[th.attr("attribute")] = th.html();
-        }
-        tr.remove();
-        tds = element.find("td");
-        tr = $("<tr></tr>");
-        for (_j = 0, _len1 = tds.length; _j < _len1; _j++) {
-          td = tds[_j];
-          td = angular.element(td);
-          attribute = attributeExtractor.extractAttribute(td);
-          th = $("<th style='cursor: pointer; -webkit-user-select: none;'></th>");
-          title = existing_ths[attribute] || attributeExtractor.extractTitle(td);
-          th.html("" + title);
-          sortable = attributeExtractor.extractSortable(td.attr("class"));
-          if (sortable) {
-            th.attr("ng-click", "predicate = '" + attribute + "'; descending = !descending;");
-            icon = angular.element("<i style='margin-left: 10px;'></i>");
-            icon.attr("ng-class", "getSortIcon('" + attribute + "')");
-            th.append(icon);
+        if (thead[0]) {
+          tr = thead.find("tr");
+          existing_ths = {};
+          _ref = tr.find("th");
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            th = _ref[_i];
+            th = angular.element(th);
+            existing_ths[th.attr("attribute")] = th.html();
           }
-          width = attributeExtractor.extractWidth(td.attr("class"));
-          th.attr("width", width);
-          tr.append(th);
+          tr.remove();
+          tds = element.find("td");
+          tr = $("<tr></tr>");
+          for (_j = 0, _len1 = tds.length; _j < _len1; _j++) {
+            td = tds[_j];
+            td = angular.element(td);
+            attribute = attributeExtractor.extractAttribute(td);
+            th = $("<th style='cursor: pointer; -webkit-user-select: none;'></th>");
+            title = existing_ths[attribute] || capitaliseFirstLetter(attributeExtractor.extractTitle(td));
+            th.html("" + title);
+            sortable = td[0].attributes.sortable || attributeExtractor.isSortable(td.attr("class"));
+            if (sortable) {
+              th.attr("ng-click", "predicate = '" + attribute + "'; descending = !descending;");
+              icon = angular.element("<i style='margin-left: 10px;'></i>");
+              icon.attr("ng-class", "getSortIcon('" + attribute + "')");
+              th.append(icon);
+            }
+            width = attributeExtractor.extractWidth(td.attr("class"));
+            th.attr("width", width);
+            tr.append(th);
+          }
+          return thead.append(tr);
         }
-        return thead.append(tr);
       };
       return {
         restrict: "AC",
