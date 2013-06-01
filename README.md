@@ -21,6 +21,19 @@ A directive for creating sortable tables with pagination.
   </table>
 ```
 
+<table>
+  <thead>
+    <tr>
+      <th>abc</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>abc</td>
+    </tr>
+  </tbody>
+</table>
+
 ## Enable sorting for any column
 
 ```html
