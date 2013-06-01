@@ -75,7 +75,13 @@
   <body ng-app="angular-table-example" ng-controller="example-ctrl">
 
     <table at-table class="table" list="filteredList">
-      <thead></thead>
+      <thead>
+        <tr>
+          <th attribute="description">
+            <i class="icon-info-sign"></i> Header with icon
+          </th>
+        </tr>
+      </thead>
       <tbody>
         <tr>
           <td at-implicit attribute="id"></td>

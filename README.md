@@ -1,17 +1,21 @@
+Written in CoffeeScript using the Superheroic AngularJS-Framework.
+
 # angular-table
 
-Lets you declare tables with very little code. Enables sorting and pagination if required.
+Lets you declare sortable tables with pagination with minimal effort, while providing high flexibilty.
 
-## Examples
+## How
 
-### No sorting, no pagination
+### Render cells implicitly
 
 ```html
-  <table at-table list="list"> <!-- list references the list in scope you would like to render -->
+  <!-- list references the list in scope you would like to render -->
+  <table at-table list="list">
+    <!-- dont declare the thead tag if you don't want to render a header -->
     <thead></thead>
     <tbody>
       <tr>
-        <!-- use at-implicit to automatically render an attribute of each item in list -->
+        <!-- use at-implicit to automatically render the attribute of each item in the list -->
         <td at-implicit attribute="id"></td>
         <!-- declare a custom title for a column -->
         <td at-implicit attribute="description" title="the description"></td>
@@ -58,7 +62,7 @@ Lets you declare tables with very little code. Enables sorting and pagination if
     <thead></thead>
     <tbody>
       <tr>
-        <!-- declare a td to be sortable -->
+        <!-- declare a column to be sortable -->
         <td sortable at-implicit attribute="id"></td>
         <!-- sorting will not be available for this column -->
         <td at-implicit attribute="description" title="the description"></td>
@@ -69,6 +73,13 @@ Lets you declare tables with very little code. Enables sorting and pagination if
       </tr>
     </tbody>
   </table>
+```
+
+Instead of declaring an empty `sortable` attribute, you can also use `class="sortable"`. This becomes
+especially useful when using haml, where you can simply write:
+
+```haml
+  %td.sortable(at-implicit attribute="id")
 ```
 
 ### Add pagination
@@ -87,8 +98,41 @@ Lets you declare tables with very little code. Enables sorting and pagination if
       </tr>
     </tbody>
   </table>
-  <!-- define the name of this pagers instance in the scope.
-       the pager must have a reference to the rendered list in order to render the pagination. -->
+  <!--
+    Define the name of this pagers instance in the scope.
+    The pager must have a reference to the rendered list so it can update itself
+    when there are items added to or removed from the list.
+  -->
   <at-pager items-per-page="5" instance="pager" list="list" />
 
 ```
+
+### Declaring widths
+
+The common ways for declaring widths work as expected: you can use colgroup, css or the `width` attribute.
+Besides that, you can also use `class="200px"`. This becomes especially useful when using haml, where you can
+simply write:
+
+```haml
+  %td.200px(at-implicit attribute="id")
+```
+
+### Customizing the header
+
+Simply provide custom th elements. You must declare `attribute` to address the specific column:
+
+```html
+  <thead>
+    <tr>
+      <th attribute="description">
+        <i class="icon-info-sign"></i> Header with icon
+      </th>
+    </tr>
+  </thead>
+```
+
+### Filtering
+
+This directive currently does not attempt to provide a mechanism for filtering. You can of course filter
+the list yourself. This will be reflected automatically by the table and the pagination, since we have a bi-directional
+binding.
