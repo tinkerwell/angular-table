@@ -6,7 +6,7 @@ Written in CoffeeScript using the superheroic AngularJS-Framework.
 
 ## How
 
-### Rendering cells: implicitly or custom
+### Rendering cells: implicit or custom
 
 ```html
   <!-- list references the list in scope you would like to render -->
