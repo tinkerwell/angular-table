@@ -1,12 +1,12 @@
-Written in CoffeeScript using the Superheroic AngularJS-Framework.
-
 # angular-table
 
 Lets you declare sortable tables with pagination with minimal effort, while providing high flexibilty.
 
+Written in CoffeeScript using the superheroic AngularJS-Framework.
+
 ## How
 
-### Render cells implicitly
+### Rendering cells: implicitly or custom
 
 ```html
   <!-- list references the list in scope you would like to render -->
@@ -27,6 +27,8 @@ Lets you declare sortable tables with pagination with minimal effort, while prov
     </tbody>
   </table>
 ```
+
+Result:
 
 <table>
   <thead>
@@ -119,7 +121,7 @@ simply write:
 
 ### Customizing the header
 
-Simply provide custom th elements. You must declare `attribute` to address the specific column:
+Simply provide custom `th` elements. You must declare `attribute` to address the specific column:
 
 ```html
   <thead>
