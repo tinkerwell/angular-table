@@ -1,0 +1,107 @@
+<html>
+  <head>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="http://code.angularjs.org/1.1.5/angular.min.js"></script>
+    <script src="../angular-table.js"></script>
+    <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
+
+    <title>angular-table examples</title>
+    <script type="text/javascript">
+
+      (function() {
+        angular.module("angular-table-example", ["angular-table"]);
+
+        angular.module("angular-table-example").controller("example-ctrl", ["$scope", "$filter", function($scope, $filter) {
+            var generateData, loremArray, nameArray, randomArray, randomWord;
+
+            loremArray = ["Lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipisicing", "elit", "sed", "do", "eiusmod", "tempor", "incididunt", "ut", "labore", "et", "dolore", "magna", "aliqua", "Ut", "enim", "ad", "minim", "veniam", "quis", "nostrud", "exercitation", "ullamco", "laboris", "nisi", "ut", "aliquip", "ex", "ea", "commodo", "consequat", "Duis", "aute", "irure", "dolor", "in", "reprehenderit", "in", "voluptate", "velit", "esse", "cillum", "dolore", "eu", "fugiat", "nulla", "pariatur", "Excepteur", "sint", "occaecat", "cupidatat", "non", "proident", "sunt", "in", "culpa", "qui", "officia", "deserunt", "mollit", "anim", "id", "est", "laborum"];
+
+            randomWord = function() {
+              var array;
+
+              array = loremArray;
+              return array[Math.floor(Math.random() * (array.length - 1))];
+            };
+            randomArray = function(maxLength) {
+              var i, length, word, _i, _results;
+
+              length = Math.floor(Math.random() * maxLength);
+              _results = [];
+              for (i = _i = 0; 0 <= length ? _i <= length : _i >= length; i = 0 <= length ? ++_i : --_i) {
+                word = randomWord();
+                _results.push({
+                  idx: i,
+                  word: word,
+                  length: word.length
+                });
+              }
+              return _results;
+            };
+            generateData = function() {
+              var i, _i, _results;
+
+              _results = [];
+              for (i = _i = 0; _i <= 9; i = ++_i) {
+                _results.push({
+                  id: i,
+                  description: "" + (randomWord()),
+                  name: "" + (randomWord()),
+                  strings: randomArray(5)
+                });
+              }
+              return _results;
+            };
+            $scope.scope = $scope;
+            $scope.list = generateData();
+            $scope.filteredList = $scope.list;
+
+            $scope.queryChanged = function() {
+              return $scope.filteredList = $filter("filter")($scope.list, $scope.query);
+            };
+            $scope.wordClass = function(word) {
+              return ["badge-success", "badge-warning", "badge-important", "badge-info", "badge-inverse"][word.length - 2] || "default";
+            };
+            return $scope.sayHi = function(item) {
+              return console.log("hello " + item.name);
+            };
+          }
+        ]);
+
+      }).call(this);
+
+    </script>
+  </head>
+
+  <body ng-app="angular-table-example" ng-controller="example-ctrl">
+
+    <table at-table class="table" list="filteredList">
+      <thead></thead>
+      <tbody>
+        <tr>
+          <td at-implicit attribute="id"></td>
+          <td at-implicit attribute="description" title="the description"></td>
+          <td title="name">
+            {{item.name}}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table at-table class="table" list="filteredList" pager="pager">
+      <thead></thead>
+      <tbody>
+        <tr>
+          <td class="sortable" at-implicit attribute="id"></td>
+          <td sortable at-implicit attribute="description" title="the description"></td>
+          <td title="name">
+            {{item.name}}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+
+    <at-pager items-per-page="5" instance="pager" list="filteredList"/>
+
+  </body>
+</html>

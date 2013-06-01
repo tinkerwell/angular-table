@@ -85,10 +85,10 @@
           constructHeader(element);
           tbody = element.find("tbody");
           tr = tbody.find("tr");
-          tr.attr("ng-repeat", "item in list | limitTo:pager.fromPage() | limitTo: pager.itemsPerPage | orderBy:predicate:descending");
+          tr.attr("ng-repeat", "item in list | limitTo:fromPage() | limitTo:toPage() | orderBy:predicate:descending");
           return {
             post: function($scope, $element, $attributes) {
-              return $scope.getSortIcon = function(predicate) {
+              $scope.getSortIcon = function(predicate) {
                 if (predicate !== $scope.predicate) {
                   return "icon-minus";
                 }
@@ -96,6 +96,20 @@
                   return "icon-chevron-down";
                 } else {
                   return "icon-chevron-up";
+                }
+              };
+              $scope.fromPage = function() {
+                if ($scope.pager) {
+                  return $scope.pager.fromPage();
+                } else {
+                  return $scope.list.length;
+                }
+              };
+              return $scope.toPage = function() {
+                if ($scope.pager) {
+                  return $scope.pager.itemsPerPage;
+                } else {
+                  return $scope.list.length;
                 }
               };
             }
@@ -126,12 +140,12 @@
         restrict: "E",
         template: "      <div class='pagination' style='margin: 0px;'>        <ul>          <li ng-class='{disabled: currentPage <= 0}'>            <a href='' ng-click='goToPage(currentPage - 1)'>&laquo;</a>          </li>          <li ng-class='{active: currentPage == page}' ng-repeat='page in pages'>            <a href='' ng-click='goToPage(page)'>{{page + 1}}</a>          </li>          <li ng-class='{disabled: currentPage >= numberOfPages - 1}'>            <a href='' ng-click='goToPage(currentPage + 1); normalize()'>&raquo;</a>          </li>        </ul>      </div>",
         scope: {
+          itemsPerPage: "@",
           instance: "=",
           list: "="
         },
         link: function($scope, $element, $attributes) {
           $scope.currentPage = 0;
-          $scope.itemsPerPage = 7;
           $scope.update = function() {
             var x;
 
