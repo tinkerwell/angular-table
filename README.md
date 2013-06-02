@@ -1,6 +1,6 @@
 # angular-table
 
-Lets you declare sortable, pageable tables with minimal effort, while providing high flexibilty.
+Lets you declare sortable, pageable tables with minimal effort while providing high flexibilty.
 
 Written in CoffeeScript using the superheroic AngularJS-Framework.
 
