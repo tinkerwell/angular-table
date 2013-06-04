@@ -1,17 +1,25 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>angular-table examples</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>{{ page.title }}</title>
+    <meta name="viewport" content="width=device-width">
 
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script src="http://code.angularjs.org/1.1.5/angular.min.js"></script>
-    <script src="angular-table.min.js"></script>
+    <script src="/js/angular-table.min.js"></script>
+    <script src="/js/angular-tabs.min.js"></script>
 
-    <link href="syntax.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/syntax.css">
 
     <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
 
     <style>
+      .main-container {
+        margin: 20px 300px 20px 300px;
+      }
+
       .redBorder {
         background-color: red;
       }
@@ -20,7 +28,7 @@
     <script type="text/javascript">
 
       (function() {
-        angular.module("angular-table-example", ["angular-table"]);
+        angular.module("angular-table-example", ["angular-table", "angular-tabs"]);
 
         angular.module("angular-table-example").controller("example-ctrl", ["$scope", "$filter", function($scope, $filter) {
             var generateData, loremArray, nameArray, randomArray, randomWord;
@@ -66,6 +74,8 @@
 
             $scope.filteredList = $scope.list;
 
+            $scope.ctrl = $scope
+
             $scope.queryChanged = function() {
               return $scope.filteredList = $filter("filter")($scope.list, $scope.query);
             };
@@ -82,81 +92,12 @@
 
       }).call(this);
 
-
     </script>
+
   </head>
-
-  <body>
-
-    <div style="margin: 10px;">
-
-      <div ng-app="angular-table-example" ng-controller="example-ctrl">
-
-        <h2>Random lorem <small>implicit cells, fixed widths, custom title</small></h2>
-        <div class="row-fluid">
-          <div class="span12">
-            <table at-table class="table table-striped table-bordered" list="shortLoremList">
-              <thead></thead>
-              <tbody>
-                <tr>
-                  <td at-implicit class="50px" attribute="id"></td>
-                  <td at-implicit class="350px" attribute="description"></td>
-                  <td at-implicit attribute="name" title="The name"></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <h2>Alotta random lorem <small>sorting, paging, custom cells</small></h2>
-        <div class="row-fluid">
-          <div class="span12">
-            <table at-table class="table table-striped table-bordered" list="longLoremList" pager="pager">
-              <thead></thead>
-              <tbody>
-                <tr>
-                  <td at-implicit sortable class="50px" attribute="id"></td>
-                  <td at-implicit sortable class="350px" attribute="description"></td>
-                  <td sortable title="length">
-                    The length of the word '{{item.name}}' is {{item.name.length}}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <at-pager items-per-page="5" instance="pager" list="longLoremList"></at-pager>
-
-        <h2>Wicked lorem table <small>custom header, custom cells</small></h2>
-
-        <div class="row-fluid">
-          <div class="span12">
-            <table at-table class="table table-bordered" list="longLoremList" pager="bigpager">
-              <thead></thead>
-              <tbody>
-                <tr>
-                  <td at-implicit sortable class="50px" attribute="id"></td>
-                  <td at-implicit sortable class="350px" attribute="description"></td>
-                  <td title="length" ng-class="{redBorder : item.name.length >= 8}">
-                    <div ng-show="item.name.length < 8">
-                      {{item.name}} isn't that long
-                    </div>
-                    <div ng-hide="item.name.length < 8">
-                      {{item.name}} is pretty long
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <at-pager items-per-page="15" instance="bigpager" list="longLoremList"></at-pager>
-
-
-
-    </div>
-
-  </body>
+    <body>
+      <div class="main-container" ng-app="angular-table-example" ng-controller="example-ctrl">
+        {{ content }}
+      </div>
+    </body>
 </html>
