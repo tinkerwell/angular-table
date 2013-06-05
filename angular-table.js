@@ -1,3 +1,5 @@
+// author: Samuel Mueller http://github.com/ssmm
+
 (function() {
   angular.module("angular-table", []);
 

@@ -1,3 +1,5 @@
+# author: Samuel Mueller http://github.com/ssmm
+
 angular.module "angular-table", []
 
 angular.module("angular-table").service "attributeExtractor", () ->
