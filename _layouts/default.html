@@ -20,7 +20,7 @@
         margin: 20px 300px 20px 300px;
       }
 
-      .redBorder {
+      .redBg {
         background-color: red;
       }
     </style>
@@ -81,6 +81,7 @@
             };
 
             $scope.wordClass = function(word) {
+              console.log("word", word)
               return ["badge-success", "badge-warning", "badge-important", "badge-info", "badge-inverse"][word.length - 2] || "default";
             };
 
