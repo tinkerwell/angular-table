@@ -3,126 +3,51 @@ layout: default
 title: Something with codes
 ---
 
-<angular-tabs class="nav-stacked" active-tab="3">
-  <div title="1">
+<angular-tabs active-tab="Custom">
+  <div title="Implicit">
+
     <h2>Random lorem <small>implicit cells, fixed widths, custom title</small></h2>
-    <div class="row-fluid">
-      <div class="span12">
-        <table at-table class="table table-striped table-bordered" list="shortLoremList">
-          <thead></thead>
-          <tbody>
-            <tr>
-              <td at-implicit class="50px" attribute="id"></td>
-              <td at-implicit class="350px" attribute="description"></td>
-              <td at-implicit attribute="name" title="The name"></td>
-              <td title="Blabla">
-                {{ "{{ item.name "}} }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
 
-<h3>HTML</h3>
+    {% include implicit.html %}
 
-{% highlight html %}
-<table at-table class="table table-striped table-bordered" list="shortLoremList">
-  <thead></thead>
-  <tbody>
-    <tr>
-      <td at-implicit class="50px" attribute="id"></td>
-      <td at-implicit class="350px" attribute="description"></td>
-      <td at-implicit attribute="name" title="The name"></td>
-    </tr>
-  </tbody>
-</table>
-{% endhighlight %}
+    <h3>HTML</h3>
+
+    {% highlight html %}
+{% include implicit.html %}
+    {% endhighlight %}
 
 
 
   </div>
 
-  <div title="2">
+  <div title="SortingPaging">
 
     <h2>Alotta random lorem <small>sorting, paging, custom cells</small></h2>
-    <div class="row-fluid">
-      <div class="span12">
-        <table at-table class="table table-striped table-bordered" list="longLoremList" pager="pager">
-          <thead></thead>
-          <tbody>
-            <tr>
-              <td at-implicit sortable class="50px" attribute="id"></td>
-              <td at-implicit sortable class="350px" attribute="description"></td>
-              <td sortable title="length">
-                The length of the word '{{ "{{ item.name "}} }}' is {{ "{{ item.name.length "}} }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
 
-    <at-pager items-per-page="5" instance="pager" list="longLoremList"></at-pager>
+    {% include sorting_paging.html %}
 
-<h3>HTML</h3>
+    <h3>HTML</h3>
 
-{% highlight html %}
-<table at-table class="table table-striped table-bordered" list="longLoremList" pager="pager">
-  <thead></thead>
-  <tbody>
-    <tr>
-      <td at-implicit sortable class="50px" attribute="id"></td>
-      <td at-implicit sortable class="350px" attribute="description"></td>
-      <td sortable title="length">
-        The length of the word '{{item.name}}' is {{item.name.length}}
-      </td>
-    </tr>
-  </tbody>
-</table>
+    {% highlight html %}
+{% include sorting_paging.html %}
+    {% endhighlight %}
 
-<at-pager items-per-page="5" instance="pager" list="longLoremList"></at-pager>
-{% endhighlight %}
+
+
 
 
   </div>
 
-  <div title="3">
-    <h2>Wicked lorem table <small>custom header, custom cells</small></h2>
+  <div title="Custom">
+    <h2>Ex girlfriends <small>custom header, custom cells</small></h2>
 
-    <table at-table class="table table-bordered" list="longLoremList" pager="bigpager" scope="ctrl">
-      <thead></thead>
-      <tbody>
-        <tr>
-          <td at-implicit sortable class="50px" attribute="id"></td>
-          <td at-implicit sortable class="350px" attribute="description"></td>
-          <td title="length">
-            <span class="badge" ng-class="scope.wordClass(item.name)">{{ "{{ item.name.length "}} }}</span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    {% include custom.html %}
 
-    <at-pager items-per-page="5" instance="bigpager" list="longLoremList"></at-pager>
+    <h3>HTML</h3>
 
-<h3>HTML</h3>
-
-{% highlight html %}
-<table at-table class="table table-bordered" list="longLoremList" pager="bigpager">
-  <thead></thead>
-  <tbody>
-    <tr>
-      <td at-implicit sortable class="50px" attribute="id"></td>
-      <td at-implicit sortable class="350px" attribute="description"></td>
-      <td title="length">
-        <span class="badge" ng-class="wordClass(item.name)">{{item.name}}</span>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-<at-pager items-per-page="5" instance="pager" list="longLoremList"></at-pager>
-{% endhighlight %}
+    {% highlight html %}
+{% include custom.html %}
+    {% endhighlight %}
 
 
   </div>
