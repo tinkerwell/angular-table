@@ -55,8 +55,8 @@
             existing_ths[th.attr("attribute")] = th.html();
           }
           tr.remove();
-          tds = element.find("td");
           tr = $("<tr></tr>");
+          tds = element.find("td");
           for (_j = 0, _len1 = tds.length; _j < _len1; _j++) {
             td = tds[_j];
             td = angular.element(td);
@@ -80,19 +80,16 @@
       };
       return {
         restrict: "AC",
-        scope: {
-          list: "=",
-          scope: "=",
-          query: "=",
-          pager: "="
-        },
+        scope: true,
         compile: function(element, attributes, transclude) {
-          var tbody, tr;
+          var listName, paginationName, tbody, tr;
 
+          paginationName = attributes.pagination;
+          listName = attributes.list || ("" + paginationName + ".list");
           constructHeader(element);
           tbody = element.find("tbody");
           tr = tbody.find("tr");
-          tr.attr("ng-repeat", "item in list | limitTo:fromPage() | limitTo:toPage() | orderBy:predicate:descending");
+          tr.attr("ng-repeat", "item in " + listName + " | limitTo:fromPage() | limitTo:toPage() | orderBy:predicate:descending");
           return {
             post: function($scope, $element, $attributes) {
               $scope.getSortIcon = function(predicate) {
@@ -106,15 +103,15 @@
                 }
               };
               $scope.fromPage = function() {
-                if ($scope.pager) {
-                  return $scope.pager.fromPage();
+                if ($scope[paginationName]) {
+                  return $scope[paginationName].fromPage();
                 } else {
                   return $scope.list.length;
                 }
               };
               return $scope.toPage = function() {
-                if ($scope.pager) {
-                  return $scope.pager.itemsPerPage;
+                if ($scope[paginationName]) {
+                  return $scope[paginationName].itemsPerPage;
                 } else {
                   return $scope.list.length;
                 }
@@ -140,46 +137,47 @@
     }
   ]);
 
-  angular.module("angular-table").directive("atPager", [
+  angular.module("angular-table").directive("atPagination", [
     "attributeExtractor", function(attributeExtractor) {
       return {
         replace: true,
         restrict: "E",
-        template: "      <div class='pagination' style='margin: 0px;'>        <ul>          <li ng-class='{disabled: currentPage <= 0}'>            <a href='' ng-click='goToPage(currentPage - 1)'>&laquo;</a>          </li>          <li ng-class='{active: currentPage == page}' ng-repeat='page in pages'>            <a href='' ng-click='goToPage(page)'>{{page + 1}}</a>          </li>          <li ng-class='{disabled: currentPage >= numberOfPages - 1}'>            <a href='' ng-click='goToPage(currentPage + 1); normalize()'>&raquo;</a>          </li>        </ul>      </div>",
+        template: "      <div class='pagination' style='margin: 0px;'>        <ul>          <li ng-class='{disabled: stub.currentPage <= 0}'>            <a href='' ng-click='goToPage(stub.currentPage - 1)'>&laquo;</a>          </li>          <li ng-class='{active: stub.currentPage == page}' ng-repeat='page in pages'>            <a href='' ng-click='goToPage(page)'>{{page + 1}}</a>          </li>          <li ng-class='{disabled: stub.currentPage >= stub.numberOfPages - 1}'>            <a href='' ng-click='goToPage(stub.currentPage + 1); normalize()'>&raquo;</a>          </li>        </ul>      </div>",
         scope: {
           itemsPerPage: "@",
           instance: "=",
           list: "="
         },
         link: function($scope, $element, $attributes) {
-          $scope.currentPage = 0;
+          $scope.stub = {};
+          $scope.instance = $scope.stub;
+          $scope.stub.list = $scope.list;
+          $scope.stub.itemsPerPage = $scope.itemsPerPage;
+          $scope.stub.currentPage = 0;
           $scope.update = function() {
             var x;
 
-            $scope.numberOfPages = Math.ceil($scope.list.length / $scope.itemsPerPage);
-            return $scope.pages = (function() {
+            $scope.stub.numberOfPages = Math.ceil($scope.list.length / $scope.stub.itemsPerPage);
+            $scope.pages = (function() {
               var _i, _ref, _results;
 
               _results = [];
-              for (x = _i = 0, _ref = $scope.numberOfPages - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; x = 0 <= _ref ? ++_i : --_i) {
+              for (x = _i = 0, _ref = $scope.stub.numberOfPages - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; x = 0 <= _ref ? ++_i : --_i) {
                 _results.push(x);
               }
               return _results;
             })();
+            return $scope.stub.list = $scope.list;
           };
-          $scope.fromPage = function() {
-            return $scope.itemsPerPage * $scope.currentPage - $scope.list.length;
+          $scope.stub.fromPage = function() {
+            return $scope.stub.itemsPerPage * $scope.stub.currentPage - $scope.list.length;
           };
           $scope.goToPage = function(page) {
-            if (page < 0) {
-              page = 0;
-            } else if (page > $scope.numberOfPages - 1) {
-              page = $scope.numberOfPages - 1;
-            }
-            return $scope.currentPage = page;
+            page = Math.max(0, page);
+            page = Math.min($scope.stub.numberOfPages - 1, page);
+            return $scope.stub.currentPage = page;
           };
           $scope.update();
-          $scope.instance = $scope;
           return $scope.$watch("list", function() {
             return $scope.update();
           });
