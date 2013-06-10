@@ -29,20 +29,16 @@ angular.module("angular-table").directive "atTable", ["attributeExtractor", (att
     thead = element.find "thead"
 
     if thead[0]
-
       tr = thead.find "tr"
-
       existing_ths = {}
-
       for th in tr.find "th"
         th = angular.element(th)
         existing_ths[th.attr("attribute")] = th.html()
 
       tr.remove()
+      tr = $("<tr></tr>")
 
       tds = element.find("td")
-
-      tr = $("<tr></tr>")
       for td in tds
         td = angular.element(td)
         attribute = attributeExtractor.extractAttribute(td)
@@ -67,19 +63,14 @@ angular.module("angular-table").directive "atTable", ["attributeExtractor", (att
     restrict: "AC"
     scope: true
     compile: (element, attributes, transclude) ->
-
-
       paginationName = attributes.pagination
-
       listName = attributes.list || "#{paginationName}.list"
 
       constructHeader(element)
 
       tbody = element.find "tbody"
       tr = tbody.find "tr"
-
       tr.attr("ng-repeat", "item in #{listName} | limitTo:fromPage() | limitTo:toPage() | orderBy:predicate:descending")
-
       {
         post: ($scope, $element, $attributes) ->
 
@@ -88,16 +79,10 @@ angular.module("angular-table").directive "atTable", ["attributeExtractor", (att
             if $scope.descending then "icon-chevron-down" else "icon-chevron-up"
 
           $scope.fromPage = () ->
-            if $scope[paginationName]
-              $scope[paginationName].fromPage()
-            else
-              $scope.list.length
+            if $scope[paginationName] then $scope[paginationName].fromPage() else $scope.list.length
 
           $scope.toPage = () ->
-            if $scope[paginationName]
-              $scope[paginationName].itemsPerPage
-            else
-              $scope.list.length
+            if $scope[paginationName] then $scope[paginationName].itemsPerPage else $scope.list.length
       }
   }
 ]
@@ -136,11 +121,9 @@ angular.module("angular-table").directive "atPagination", ["attributeExtractor",
     }
     link: ($scope, $element, $attributes) ->
       $scope.stub = {}
-
+      $scope.instance = $scope.stub
       $scope.stub.list = $scope.list
-
       $scope.stub.itemsPerPage = $scope.itemsPerPage
-
       $scope.stub.currentPage = 0
 
       $scope.update = () ->
@@ -153,16 +136,12 @@ angular.module("angular-table").directive "atPagination", ["attributeExtractor",
         $scope.stub.itemsPerPage * $scope.stub.currentPage - $scope.list.length
 
       $scope.goToPage = (page) ->
-        if page < 0
-          page = 0
-        else if page > $scope.stub.numberOfPages - 1
-          page = $scope.stub.numberOfPages - 1
+        page = Math.max(0, page)
+        page = Math.min($scope.stub.numberOfPages - 1, page)
 
         $scope.stub.currentPage = page
 
       $scope.update()
-
-      $scope.instance = $scope.stub
 
       $scope.$watch "list", () ->
         $scope.update()
