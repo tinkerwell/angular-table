@@ -1,3 +1,4 @@
+{% raw %}
 <table at-table class="table table-striped table-bordered" list="longLoremList" pager="pager">
   <thead></thead>
   <tbody>
@@ -5,10 +6,11 @@
       <td at-implicit sortable class="50px" attribute="id"></td>
       <td at-implicit sortable class="350px" attribute="description"></td>
       <td sortable title="length">
-        The length of the word '<span ng-bind="item.name"></span>' is <span ng-bind="item.name.length"></span>
+        The length of the word '{{item.description}}' is {{item.description.length}}</span>
       </td>
     </tr>
   </tbody>
 </table>
 
 <at-pager items-per-page="5" instance="pager" list="longLoremList"></at-pager>
+{% endraw %}
