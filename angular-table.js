@@ -82,14 +82,21 @@
         restrict: "AC",
         scope: true,
         compile: function(element, attributes, transclude) {
-          var listName, paginationName, tbody, tr;
+          var filterString, listName, paginationName, tbody, tr;
 
-          paginationName = attributes.pagination;
-          listName = attributes.list || ("" + paginationName + ".list");
           constructHeader(element);
+          if (attributes.pagination && attributes.list) {
+            throw "List and pagination defined on the same table.";
+          }
+          paginationName = attributes.pagination;
+          filterString = "";
+          if (paginationName) {
+            filterString = "| limitTo:fromPage() | limitTo:toPage()";
+          }
+          listName = attributes.list || ("" + paginationName + ".list");
           tbody = element.find("tbody");
           tr = tbody.find("tr");
-          tr.attr("ng-repeat", "item in " + listName + " | limitTo:fromPage() | limitTo:toPage() | orderBy:predicate:descending");
+          tr.attr("ng-repeat", "item in " + listName + " " + filterString + " | orderBy:predicate:descending");
           return {
             post: function($scope, $element, $attributes) {
               $scope.getSortIcon = function(predicate) {
@@ -105,15 +112,11 @@
               $scope.fromPage = function() {
                 if ($scope[paginationName]) {
                   return $scope[paginationName].fromPage();
-                } else {
-                  return $scope.list.length;
                 }
               };
               return $scope.toPage = function() {
                 if ($scope[paginationName]) {
                   return $scope[paginationName].itemsPerPage;
-                } else {
-                  return $scope.list.length;
                 }
               };
             }
@@ -178,9 +181,10 @@
             return $scope.stub.currentPage = page;
           };
           $scope.update();
-          return $scope.$watch("list", function() {
+          $scope.$watch("list", function() {
             return $scope.update();
           });
+          return console.log("pagination loaded!");
         }
       };
     }

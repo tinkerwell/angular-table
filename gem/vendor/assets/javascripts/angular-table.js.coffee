@@ -63,14 +63,27 @@ angular.module("angular-table").directive "atTable", ["attributeExtractor", (att
     restrict: "AC"
     scope: true
     compile: (element, attributes, transclude) ->
-      paginationName = attributes.pagination
-      listName = attributes.list || "#{paginationName}.list"
 
       constructHeader(element)
 
+      # TODO: better exception handling
+      if attributes.pagination and attributes.list then throw "List and pagination defined on the same table."
+
+
+      # TODO: better handling of the following if/else stuff
+      paginationName = attributes.pagination
+
+      filterString = ""
+
+      if paginationName
+         filterString = "| limitTo:fromPage() | limitTo:toPage()"
+
+      listName = attributes.list || "#{paginationName}.list"
+
       tbody = element.find "tbody"
       tr = tbody.find "tr"
-      tr.attr("ng-repeat", "item in #{listName} | limitTo:fromPage() | limitTo:toPage() | orderBy:predicate:descending")
+      tr.attr("ng-repeat", "item in #{listName} #{filterString} | orderBy:predicate:descending")
+
       {
         post: ($scope, $element, $attributes) ->
 
@@ -79,10 +92,11 @@ angular.module("angular-table").directive "atTable", ["attributeExtractor", (att
             if $scope.descending then "icon-chevron-down" else "icon-chevron-up"
 
           $scope.fromPage = () ->
-            if $scope[paginationName] then $scope[paginationName].fromPage() else $scope.list.length
+            if $scope[paginationName] then $scope[paginationName].fromPage()
 
           $scope.toPage = () ->
-            if $scope[paginationName] then $scope[paginationName].itemsPerPage else $scope.list.length
+            if $scope[paginationName] then $scope[paginationName].itemsPerPage
+
       }
   }
 ]
@@ -145,5 +159,7 @@ angular.module("angular-table").directive "atPagination", ["attributeExtractor",
 
       $scope.$watch "list", () ->
         $scope.update()
+
+      console.log "pagination loaded!"
   }
 ]
