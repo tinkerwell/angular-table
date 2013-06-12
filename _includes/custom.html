@@ -1,5 +1,5 @@
-<!-- {% raw %}
-<table at-table class="table table-striped table-bordered" list="exGfsList" pager="coolpager" scope="ctrl">
+{% raw %}
+<table at-table class="table table-striped table-bordered" pagination="coolpager">
   <thead>
     <th attribute="hotness"><i class="icon-fire"></i> Hot?</th>
     <th attribute="crazyness"><i class="icon-exclamation-sign"></i> Crazy?</th>
@@ -8,17 +8,17 @@
     <tr>
       <td at-implicit sortable class="50px" attribute="name"></td>
       <td sortable class="350px" attribute="hotness">
-        <span ng-class="scope.getDescriptionClass(item.hotness)">{{item.hotness}}</span>
+        <span ng-class="getDescriptionClass(item.hotness)">{{item.hotness}}</span>
       </td>
       <td sortable class="350px" attribute="crazyness">
-        <span ng-class="scope.getDescriptionClass(item.crazyness)">{{item.crazyness}}</span>
+        <span ng-class="getDescriptionClass(item.crazyness)">{{item.crazyness}}</span>
       </td>
       <td class="350px" title="Good Combination?">
-        {{scope.isGoodCombination(item.hotness, item.crazyness)}}
+        {{isGoodCombination(item.hotness, item.crazyness)}}
       </td>
     </tr>
   </tbody>
 </table>
 
-<at-pager items-per-page="5" instance="coolpager" list="exGfsList"></at-pager>
-{% endraw %} -->
+<at-pagination items-per-page="5" instance="coolpager" list="exGfsList"></at-pagination>
+{% endraw %}
