@@ -89,8 +89,8 @@ especially useful when using haml, where you can simply write:
 ### Add pagination
 
 ```html
-  <!-- reference the pager defined below -->
-  <table at-table class="table" list="list" pager="pager">
+  <!-- reference the pagination defined below -->
+  <table at-table class="table" list="list" pagination="pagination">
     <thead></thead>
     <tbody>
       <tr>
@@ -104,10 +104,10 @@ especially useful when using haml, where you can simply write:
   </table>
   <!--
     Define the name of this pagers instance in the scope.
-    The pager must have a reference to the rendered list so it can update itself
+    The pagination must have a reference to the rendered list so it can update itself
     when there are items added to or removed from the list.
   -->
-  <at-pager items-per-page="5" instance="pager" list="list" />
+  <at-pagination items-per-page="5" instance="pagination" list="list" />
 
 ```
 
