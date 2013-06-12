@@ -103,7 +103,7 @@ especially useful when using haml, where you can simply write:
     </tbody>
   </table>
   <!--
-    Define the name of this pagers instance in the scope.
+    Define the name of this paginations instance in the scope.
     The pagination must have a reference to the rendered list so it can update itself
     when there are items added to or removed from the list.
   -->
