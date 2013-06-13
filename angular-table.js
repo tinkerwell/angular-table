@@ -181,10 +181,9 @@
             return $scope.stub.currentPage = page;
           };
           $scope.update();
-          $scope.$watch("list", function() {
+          return $scope.$watch("list", function() {
             return $scope.update();
           });
-          return console.log("pagination loaded!");
         }
       };
     }

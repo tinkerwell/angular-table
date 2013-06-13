@@ -160,6 +160,5 @@ angular.module("angular-table").directive "atPagination", ["attributeExtractor",
       $scope.$watch "list", () ->
         $scope.update()
 
-      console.log "pagination loaded!"
   }
 ]
