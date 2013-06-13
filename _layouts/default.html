@@ -36,38 +36,6 @@
             loremArray = ["Lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipisicing", "elit", "sed", "do", "eiusmod", "tempor", "incididunt", "ut", "labore", "et", "dolore", "magna", "aliqua", "Ut", "enim", "ad", "minim", "veniam", "quis", "nostrud", "exercitation", "ullamco", "laboris", "nisi", "ut", "aliquip", "ex", "ea", "commodo", "consequat", "Duis", "aute", "irure", "dolor", "in", "reprehenderit", "in", "voluptate", "velit", "esse", "cillum", "dolore", "eu", "fugiat", "nulla", "pariatur", "Excepteur", "sint", "occaecat", "cupidatat", "non", "proident", "sunt", "in", "culpa", "qui", "officia", "deserunt", "mollit", "anim", "id", "est", "laborum"];
 
 
-            exGfsArray = ["Anna", "Lea", "Maria", "Sarah", "Laura", "Rahel", "Laila"];
-            description = ["Nope", "A bit", "Yes", "Very"];
-
-
-            generateExGfList = function(src, length) {
-              var results = [];
-              for (var i = 0; i < length; i++) {
-                results.push({
-                  id: i,
-                  name: randomWord(exGfsArray),
-                  hotness: randomWord(description),
-                  crazyness: randomWord(description)
-                });
-              }
-              return results;
-            };
-
-            $scope.getDescriptionClass = function(description) {
-              if (description == "Nope") return "badge"
-              if (description == "A bit") return "badge badge-info"
-              if (description == "Yes") return "badge badge-warning"
-              if (description == "Very") return "badge badge-important"
-            }
-
-
-
-            $scope.isGoodCombination = function(hotness, crazyness) {
-              if ((hotness == "Very" || hotness == "Yes") && (crazyness == "Nope" || crazyness == "A bit")) return "You should get her back"
-              if ((crazyness == "Very" || crazyness == "Yes") && (hotness == "Nope" || hotness == "A bit")) return "Never mind"
-              return "Okay..."
-            }
-
             randomWord = function(src) {
               return src[Math.floor(Math.random() * (src.length))];
             };
@@ -79,50 +47,52 @@
                 var word = randomWord(src);
                 results.push({
                   idx: i,
-                  word: word,
-                  length: word.length
+                  word: word
                 });
               }
               return results;
             };
 
-            generateData = function(src, length) {
+            randomList = function(src, length) {
               var results = [];
               for (var i = 0; i < length; i++) {
-                results.push({
+                entry = {
                   id: i,
                   description: randomWord(src),
-                  name: randomWord(src),
-                  strings: randomArray(src, 5)
-                });
+                  // name: randomWord(src),
+                  // strings: randomArray(src, 5)
+                };
+                entry.lengthOfDescription = entry.description.length;
+                // entry.numberOfStrings = entry.strings.length;
+                results.push(entry);
               }
               return results;
             };
 
-            $scope.scope = $scope;
+            $scope.shortLoremList = randomList(loremArray, 5);
 
-            $scope.shortLoremList = generateData(loremArray, 5);
+            $scope.longLoremList = randomList(loremArray, 50);
 
-            $scope.longLoremList = generateData(loremArray, 50);
+            $scope.filteredList = $scope.longLoremList
 
-            $scope.exGfsList = generateExGfList(exGfsArray, 15);
-
-            console.log($scope.exGfsList)
-
-            $scope.filteredList = $scope.list;
-
-            $scope.ctrl = $scope
-
-            $scope.queryChanged = function() {
-              return $scope.filteredList = $filter("filter")($scope.list, $scope.query);
+            $scope.queryChanged = function(query) {
+              return $scope.filteredList = $filter("filter")($scope.longLoremList, query);
             };
 
-            $scope.wordClass = function(word) {
-              return ["badge-success", "badge-warning", "badge-important", "badge-info", "badge-inverse"][word.length - 2] || "default";
+            var vowels = ["a", "e", "i", "o", "u"];
+            $scope.vowelsList = function(word) {
+              list = [];
+              for(var i = 0; i < vowels.length; i++) {
+                if (word.indexOf(vowels[i]) > -1) {
+                  list.push(vowels[i]);
+                }
+              }
+              return list;
             };
 
-            return $scope.sayHi = function(item) {
-              console.log("hello " + item.name);
+            var vowelClasses = ["badge-success", "badge-warning", "badge-important", "badge-info", "badge-inverse"];
+            $scope.vowelClass = function(vowel) {
+              return vowelClasses[vowels.indexOf(vowel)];
             };
           }
         ]);

@@ -1,5 +1,7 @@
 {% raw %}
-<table at-table class="table table-striped table-bordered" pagination="wildPagination">
+<input type="text" ng-model="query" ng-change="queryChanged(query)">
+
+<table at-table class="table table-striped table-bordered" pagination="filteringPagination">
   <thead></thead>
   <tbody>
     <tr>
@@ -12,5 +14,5 @@
   </tbody>
 </table>
 
-<at-pagination items-per-page="7" instance="wildPagination" list="longLoremList"></at-pagination>
+<at-pagination items-per-page="7" instance="filteringPagination" list="filteredList"></at-pagination>
 {% endraw %}

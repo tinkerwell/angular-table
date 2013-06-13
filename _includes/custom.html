@@ -1,24 +1,19 @@
 {% raw %}
-<table at-table class="table table-striped table-bordered" pagination="coolpager">
+<table at-table class="table table-striped table-bordered" pagination="vowelPagination">
   <thead>
-    <th attribute="hotness"><i class="icon-fire"></i> Hot?</th>
-    <th attribute="crazyness"><i class="icon-exclamation-sign"></i> Crazy?</th>
+    <th attribute="vowels"><i class="icon-star"></i>Contained vowels<i class="icon-star"></i></th>
   </thead>
   <tbody>
     <tr>
-      <td at-implicit sortable class="50px" attribute="name"></td>
-      <td sortable class="350px" attribute="hotness">
-        <span ng-class="getDescriptionClass(item.hotness)">{{item.hotness}}</span>
-      </td>
-      <td sortable class="350px" attribute="crazyness">
-        <span ng-class="getDescriptionClass(item.crazyness)">{{item.crazyness}}</span>
-      </td>
-      <td class="350px" title="Good Combination?">
-        {{isGoodCombination(item.hotness, item.crazyness)}}
+      <td at-implicit sortable class="100px" attribute="description"></td>
+      <td title="Vowels" attribute="vowels">
+        <span ng-repeat="vowel in vowelsList(item.description)" class="badge" ng-class="vowelClass(vowel)">
+          {{vowel}}
+        </span>
       </td>
     </tr>
   </tbody>
 </table>
 
-<at-pagination items-per-page="5" instance="coolpager" list="exGfsList"></at-pagination>
+<at-pagination items-per-page="5" instance="vowelPagination" list="longLoremList"></at-pagination>
 {% endraw %}

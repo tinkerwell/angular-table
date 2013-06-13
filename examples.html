@@ -5,7 +5,6 @@ title: Something with codes
 
 <angular-tabs active-tab="Implicit">
   <div title="Implicit">
-
     <h2>Random lorem <small>implicit cells, fixed widths, custom title</small></h2>
 
     {% include implicit.html %}
@@ -17,14 +16,10 @@ title: Something with codes
 {% include implicit.html %}
     {% endhighlight %}
     </div>
-
-
-
   </div>
 
   <div title="SortingPaging">
-
-    <h2>Alotta random lorem <small>sorting, paging, custom cells</small></h2>
+    <h2>Lots of random lorem <small>sorting, paging, custom cells</small></h2>
 
     {% include sorting_paging.html %}
 
@@ -35,14 +30,10 @@ title: Something with codes
 {% include sorting_paging.html %}
     {% endhighlight %}
     </div>
-
-
-
-
   </div>
 
   <div title="Custom">
-    <h2>Ex girlfriends <small>custom header, custom cells</small></h2>
+    <h2>Lorem vowels <small>custom header, custom cells</small></h2>
 
     {% include custom.html %}
 
@@ -51,6 +42,30 @@ title: Something with codes
     <div ng-non-bindable>
     {% highlight html %}
 {% include custom.html %}
+    {% endhighlight %}
+    </div>
+  </div>
+
+  <div title="Filtering">
+    <h2>Filtering <small>filtering</small></h2>
+
+    {% include filtering.html %}
+
+    <h3>In the controller</h3>
+
+    {% highlight javascript%}
+$scope.filteredList = $scope.longLoremList
+
+$scope.queryChanged = function(query) {
+  return $scope.filteredList = $filter("filter")($scope.longLoremList, query);
+};
+    {% endhighlight %}
+
+    <h3>HTML</h3>
+
+    <div ng-non-bindable>
+    {% highlight html %}
+{% include filtering.html %}
     {% endhighlight %}
     </div>
 
