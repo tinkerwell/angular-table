@@ -37,7 +37,7 @@
 
   angular.module("angular-table").directive("atTable", [
     "attributeExtractor", function(attributeExtractor) {
-      var capitaliseFirstLetter, constructHeader, validateInput;
+      var PaginationSetup, StandardSetup, capitaliseFirstLetter, constructHeader, createSetup, setupTr, validateInput;
 
       capitaliseFirstLetter = function(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -87,23 +87,73 @@
           throw "Either a list or pagination must be specified.";
         }
       };
+      setupTr = function(element, repeatString) {
+        var tbody, tr;
+
+        tbody = element.find("tbody");
+        tr = tbody.find("tr");
+        tr.attr("ng-repeat", repeatString);
+        return tbody;
+      };
+      StandardSetup = function(attributes) {
+        this.repeatString = "item in " + attributes.list + " | orderBy:predicate:descending";
+        this.compile = function(element, attributes, transclude) {
+          return setupTr(element, this.repeatString);
+        };
+        this.link = function() {};
+      };
+      PaginationSetup = function(attributes) {
+        this.repeatString = "item in " + attributes.pagination + ".list | limitTo:fromPage() | limitTo:toPage() | orderBy:predicate:descending";
+        this.compile = function(element, attributes, transclude) {
+          var fillerTr, tbody, td, tdString, tds, _i, _len;
+
+          tbody = setupTr(element, this.repeatString);
+          if (typeof attributes.fillLastPage !== "undefined") {
+            tds = element.find("td");
+            tdString = "";
+            for (_i = 0, _len = tds.length; _i < _len; _i++) {
+              td = tds[_i];
+              tdString += "<td>{{item}}&nbsp;</td>";
+            }
+            fillerTr = angular.element("<tr>" + tdString + "</tr>");
+            fillerTr.attr("ng-repeat", "item in " + attributes.pagination + ".getFillerArray() ");
+            return tbody.append(fillerTr);
+          }
+        };
+        this.link = function($scope, $element, $attributes) {
+          var paginationName;
+
+          paginationName = attributes.pagination;
+          $scope.fromPage = function() {
+            if ($scope[paginationName]) {
+              return $scope[paginationName].fromPage();
+            }
+          };
+          return $scope.toPage = function() {
+            if ($scope[paginationName]) {
+              return $scope[paginationName].itemsPerPage;
+            }
+          };
+        };
+      };
+      createSetup = function(attributes) {
+        validateInput(attributes);
+        if (attributes.list) {
+          return new StandardSetup(attributes);
+        }
+        if (attributes.pagination) {
+          return new PaginationSetup(attributes);
+        }
+      };
       return {
         restrict: "AC",
         scope: true,
         compile: function(element, attributes, transclude) {
-          var filterString, listName, paginationName, tbody, tr;
+          var setup;
 
-          validateInput(attributes);
+          setup = createSetup(attributes);
           constructHeader(element);
-          paginationName = attributes.pagination;
-          filterString = "";
-          if (paginationName) {
-            filterString = "| limitTo:fromPage() | limitTo:toPage()";
-          }
-          listName = attributes.list || ("" + paginationName + ".list");
-          tbody = element.find("tbody");
-          tr = tbody.find("tr");
-          tr.attr("ng-repeat", "item in " + listName + " " + filterString + " | orderBy:predicate:descending");
+          setup.compile(element, attributes, transclude);
           return {
             post: function($scope, $element, $attributes) {
               $scope.getSortIcon = function(predicate) {
@@ -116,16 +166,7 @@
                   return "icon-chevron-up";
                 }
               };
-              $scope.fromPage = function() {
-                if ($scope[paginationName]) {
-                  return $scope[paginationName].fromPage();
-                }
-              };
-              return $scope.toPage = function() {
-                if ($scope[paginationName]) {
-                  return $scope[paginationName].itemsPerPage;
-                }
-              };
+              return setup.link($scope, $element, $attributes);
             }
           };
         }
