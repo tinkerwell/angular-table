@@ -59,15 +59,21 @@ angular.module("angular-table").directive "atTable", ["attributeExtractor", (att
 
       thead.append tr
 
+  validateInput = (attributes) ->
+    if attributes.pagination and attributes.list
+      throw "You can not specify a list if you have specified a pagination. The list defined for the pagnination will automatically be used."
+    if not attributes.pagination and not attributes.list
+      throw "Either a list or pagination must be specified."
+
   {
     restrict: "AC"
     scope: true
     compile: (element, attributes, transclude) ->
 
+      validateInput attributes
+
       constructHeader(element)
 
-      # TODO: better exception handling
-      if attributes.pagination and attributes.list then throw "List and pagination defined on the same table."
 
 
       # TODO: better handling of the following if/else stuff
@@ -134,6 +140,7 @@ angular.module("angular-table").directive "atPagination", ["attributeExtractor",
       list: "="
     }
     link: ($scope, $element, $attributes) ->
+
       $scope.stub = {}
       $scope.instance = $scope.stub
       $scope.stub.list = $scope.list
@@ -141,13 +148,20 @@ angular.module("angular-table").directive "atPagination", ["attributeExtractor",
       $scope.stub.currentPage = 0
 
       $scope.update = () ->
-        $scope.stub.numberOfPages = Math.ceil($scope.list.length / $scope.stub.itemsPerPage)
-        $scope.pages = for x in [0..($scope.stub.numberOfPages - 1)]
-          x
-        $scope.stub.list = $scope.list
+        $scope.stub.currentPage = 0
+        if $scope.list
+          if $scope.list.length > 0
+            $scope.stub.numberOfPages = Math.ceil($scope.list.length / $scope.stub.itemsPerPage)
+            $scope.pages = for x in [0..($scope.stub.numberOfPages - 1)]
+              x
+          else
+            $scope.stub.numberOfPages = 0
+            $scope.pages = []
+          $scope.stub.list = $scope.list
 
       $scope.stub.fromPage = () ->
-        $scope.stub.itemsPerPage * $scope.stub.currentPage - $scope.list.length
+        if $scope.list
+          $scope.stub.itemsPerPage * $scope.stub.currentPage - $scope.list.length
 
       $scope.goToPage = (page) ->
         page = Math.max(0, page)
