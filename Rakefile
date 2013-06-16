@@ -2,6 +2,8 @@ task :default => [:compile]
 
 task :compile do
 
+  require File.expand_path("gem/lib/angular-table/version")
+
   require "coffee-script"
   require "uglifier"
 
@@ -13,7 +15,11 @@ task :compile do
 end
 
 def prepend_author_notice script
-  script.prepend "// homepage: http://github.com/ssmm/angular-table \n"
-  script.prepend "// author: Samuel Mueller \n"
+  comments = ""
+  comments << "// author: Samuel Mueller \n"
+  comments << "// homepage: http://github.com/ssmm/angular-table \n"
+  comments << "// version: #{AngularTable::VERSION} \n"
+
+  script.prepend comments
   script
 end
