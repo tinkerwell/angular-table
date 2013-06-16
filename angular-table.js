@@ -91,7 +91,7 @@
         restrict: "AC",
         scope: true,
         compile: function(element, attributes, transclude) {
-          var filterString, listName, paginationName, tbody, tr;
+          var fillerTr, filterString, listName, paginationName, tbody, td, tdString, tds, tr, _i, _len;
 
           validateInput(attributes);
           constructHeader(element);
@@ -104,6 +104,15 @@
           tbody = element.find("tbody");
           tr = tbody.find("tr");
           tr.attr("ng-repeat", "item in " + listName + " " + filterString + " | orderBy:predicate:descending");
+          tds = element.find("td");
+          tdString = "";
+          for (_i = 0, _len = tds.length; _i < _len; _i++) {
+            td = tds[_i];
+            tdString += "<td>{{item}}&nbsp;</td>";
+          }
+          fillerTr = angular.element("<tr>" + tdString + "</tr>");
+          fillerTr.attr("ng-repeat", "item in " + paginationName + ".getFillerArray() ");
+          tbody.append(fillerTr);
           return {
             post: function($scope, $element, $attributes) {
               $scope.getSortIcon = function(predicate) {
@@ -152,50 +161,64 @@
       return {
         replace: true,
         restrict: "E",
-        template: "      <div class='pagination' style='margin: 0px;'>        <ul>          <li ng-class='{disabled: stub.currentPage <= 0}'>            <a href='' ng-click='goToPage(stub.currentPage - 1)'>&laquo;</a>          </li>          <li ng-class='{active: stub.currentPage == page}' ng-repeat='page in pages'>            <a href='' ng-click='goToPage(page)'>{{page + 1}}</a>          </li>          <li ng-class='{disabled: stub.currentPage >= stub.numberOfPages - 1}'>            <a href='' ng-click='goToPage(stub.currentPage + 1); normalize()'>&raquo;</a>          </li>        </ul>      </div>",
+        template: "      <div class='pagination' style='margin: 0px;'>        <ul>          <li ng-class='{disabled: currentPage <= 0}'>            <a href='' ng-click='goToPage(currentPage - 1)'>&laquo;</a>          </li>          <li ng-class='{active: currentPage == page}' ng-repeat='page in pages'>            <a href='' ng-click='goToPage(page)'>{{page + 1}}</a>          </li>          <li ng-class='{disabled: currentPage >= numberOfPages - 1}'>            <a href='' ng-click='goToPage(currentPage + 1); normalize()'>&raquo;</a>          </li>        </ul>      </div>",
         scope: {
           itemsPerPage: "@",
           instance: "=",
           list: "="
         },
         link: function($scope, $element, $attributes) {
-          $scope.stub = {};
-          $scope.instance = $scope.stub;
-          $scope.stub.list = $scope.list;
-          $scope.stub.itemsPerPage = $scope.itemsPerPage;
-          $scope.stub.currentPage = 0;
+          $scope.instance = $scope;
+          $scope.currentPage = 0;
           $scope.update = function() {
             var x;
 
-            $scope.stub.currentPage = 0;
+            $scope.currentPage = 0;
             if ($scope.list) {
               if ($scope.list.length > 0) {
-                $scope.stub.numberOfPages = Math.ceil($scope.list.length / $scope.stub.itemsPerPage);
+                $scope.numberOfPages = Math.ceil($scope.list.length / $scope.itemsPerPage);
                 $scope.pages = (function() {
                   var _i, _ref, _results;
 
                   _results = [];
-                  for (x = _i = 0, _ref = $scope.stub.numberOfPages - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; x = 0 <= _ref ? ++_i : --_i) {
+                  for (x = _i = 0, _ref = $scope.numberOfPages - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; x = 0 <= _ref ? ++_i : --_i) {
                     _results.push(x);
                   }
                   return _results;
                 })();
               } else {
-                $scope.stub.numberOfPages = 0;
+                $scope.numberOfPages = 0;
                 $scope.pages = [];
               }
-              return $scope.stub.list = $scope.list;
+              return $scope.list = $scope.list;
             }
           };
-          $scope.stub.fromPage = function() {
+          $scope.fromPage = function() {
             if ($scope.list) {
-              return $scope.stub.itemsPerPage * $scope.stub.currentPage - $scope.list.length;
+              return $scope.itemsPerPage * $scope.currentPage - $scope.list.length;
+            }
+          };
+          $scope.getFillerArray = function() {
+            var fillerLength, itemCountOnLastPage, x, _i, _ref, _ref1, _results;
+
+            if ($scope.currentPage === $scope.numberOfPages - 1) {
+              itemCountOnLastPage = $scope.list.length % $scope.itemsPerPage;
+              if (itemCountOnLastPage !== 0) {
+                fillerLength = $scope.itemsPerPage - itemCountOnLastPage - 1;
+                _results = [];
+                for (x = _i = _ref = $scope.list.length, _ref1 = $scope.list.length + fillerLength; _ref <= _ref1 ? _i <= _ref1 : _i >= _ref1; x = _ref <= _ref1 ? ++_i : --_i) {
+                  _results.push(x);
+                }
+                return _results;
+              } else {
+                return [];
+              }
             }
           };
           $scope.goToPage = function(page) {
             page = Math.max(0, page);
-            page = Math.min($scope.stub.numberOfPages - 1, page);
-            return $scope.stub.currentPage = page;
+            page = Math.min($scope.numberOfPages - 1, page);
+            return $scope.currentPage = page;
           };
           $scope.update();
           return $scope.$watch("list", function() {
