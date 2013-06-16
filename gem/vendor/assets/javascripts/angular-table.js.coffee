@@ -132,14 +132,14 @@ angular.module("angular-table").directive "atPagination", ["attributeExtractor",
     template: "
       <div class='pagination' style='margin: 0px;'>
         <ul>
-          <li ng-class='{disabled: stub.currentPage <= 0}'>
-            <a href='' ng-click='goToPage(stub.currentPage - 1)'>&laquo;</a>
+          <li ng-class='{disabled: currentPage <= 0}'>
+            <a href='' ng-click='goToPage(currentPage - 1)'>&laquo;</a>
           </li>
-          <li ng-class='{active: stub.currentPage == page}' ng-repeat='page in pages'>
+          <li ng-class='{active: currentPage == page}' ng-repeat='page in pages'>
             <a href='' ng-click='goToPage(page)'>{{page + 1}}</a>
           </li>
-          <li ng-class='{disabled: stub.currentPage >= stub.numberOfPages - 1}'>
-            <a href='' ng-click='goToPage(stub.currentPage + 1); normalize()'>&raquo;</a>
+          <li ng-class='{disabled: currentPage >= numberOfPages - 1}'>
+            <a href='' ng-click='goToPage(currentPage + 1); normalize()'>&raquo;</a>
           </li>
         </ul>
       </div>"
@@ -150,33 +150,30 @@ angular.module("angular-table").directive "atPagination", ["attributeExtractor",
     }
     link: ($scope, $element, $attributes) ->
 
-      $scope.stub = {}
-      $scope.instance = $scope.stub
-      $scope.stub.list = $scope.list
-      $scope.stub.itemsPerPage = $scope.itemsPerPage
-      $scope.stub.currentPage = 0
+      $scope.instance = $scope
+      $scope.currentPage = 0
 
       $scope.update = () ->
-        $scope.stub.currentPage = 0
+        $scope.currentPage = 0
         if $scope.list
           if $scope.list.length > 0
-            $scope.stub.numberOfPages = Math.ceil($scope.list.length / $scope.stub.itemsPerPage)
-            $scope.pages = for x in [0..($scope.stub.numberOfPages - 1)]
+            $scope.numberOfPages = Math.ceil($scope.list.length / $scope.itemsPerPage)
+            $scope.pages = for x in [0..($scope.numberOfPages - 1)]
               x
           else
-            $scope.stub.numberOfPages = 0
+            $scope.numberOfPages = 0
             $scope.pages = []
-          $scope.stub.list = $scope.list
+          $scope.list = $scope.list
 
-      $scope.stub.fromPage = () ->
+      $scope.fromPage = () ->
         if $scope.list
-          $scope.stub.itemsPerPage * $scope.stub.currentPage - $scope.list.length
+          $scope.itemsPerPage * $scope.currentPage - $scope.list.length
 
-      $scope.stub.getFillerArray = () ->
-        if $scope.stub.currentPage == $scope.stub.numberOfPages - 1
-          itemCountOnLastPage = $scope.list.length % $scope.stub.itemsPerPage
+      $scope.getFillerArray = () ->
+        if $scope.currentPage == $scope.numberOfPages - 1
+          itemCountOnLastPage = $scope.list.length % $scope.itemsPerPage
           if itemCountOnLastPage != 0
-            fillerLength = $scope.stub.itemsPerPage - itemCountOnLastPage - 1
+            fillerLength = $scope.itemsPerPage - itemCountOnLastPage - 1
             x for x in [($scope.list.length)..($scope.list.length + fillerLength)]
           else
             []
@@ -184,9 +181,9 @@ angular.module("angular-table").directive "atPagination", ["attributeExtractor",
 
       $scope.goToPage = (page) ->
         page = Math.max(0, page)
-        page = Math.min($scope.stub.numberOfPages - 1, page)
+        page = Math.min($scope.numberOfPages - 1, page)
 
-        $scope.stub.currentPage = page
+        $scope.currentPage = page
 
       $scope.update()
 
