@@ -88,16 +88,15 @@ angular.module("angular-table").directive "atTable", ["attributeExtractor", (att
       tr = tbody.find "tr"
       tr.attr("ng-repeat", "item in #{listName} #{filterString} | orderBy:predicate:descending")
 
-      tds = element.find("td")
-      tdString = ""
-      for td in tds
-        tdString += "<td>{{item}}&nbsp;</td>"
+      # tds = element.find("td")
+      # tdString = ""
+      # for td in tds
+      #   tdString += "<td>{{item}}&nbsp;</td>"
 
+      # fillerTr = angular.element("<tr>#{tdString}</tr>")
+      # fillerTr.attr("ng-repeat", "item in #{paginationName}.getFillerArray() ")
 
-      fillerTr = angular.element("<tr>#{tdString}</tr>")
-      fillerTr.attr("ng-repeat", "item in #{paginationName}.getFillerArray() ")
-
-      tbody.append(fillerTr)
+      # tbody.append(fillerTr)
 
       {
         post: ($scope, $element, $attributes) ->
