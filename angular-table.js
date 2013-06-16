@@ -36,7 +36,7 @@
 
   angular.module("angular-table").directive("atTable", [
     "attributeExtractor", function(attributeExtractor) {
-      var capitaliseFirstLetter, constructHeader;
+      var capitaliseFirstLetter, constructHeader, validateInput;
 
       capitaliseFirstLetter = function(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -78,16 +78,22 @@
           return thead.append(tr);
         }
       };
+      validateInput = function(attributes) {
+        if (attributes.pagination && attributes.list) {
+          throw "You can not specify a list if you have specified a pagination. The list defined for the pagnination will automatically be used.";
+        }
+        if (!attributes.pagination && !attributes.list) {
+          throw "Either a list or pagination must be specified.";
+        }
+      };
       return {
         restrict: "AC",
         scope: true,
         compile: function(element, attributes, transclude) {
           var filterString, listName, paginationName, tbody, tr;
 
+          validateInput(attributes);
           constructHeader(element);
-          if (attributes.pagination && attributes.list) {
-            throw "List and pagination defined on the same table.";
-          }
           paginationName = attributes.pagination;
           filterString = "";
           if (paginationName) {
@@ -160,20 +166,30 @@
           $scope.update = function() {
             var x;
 
-            $scope.stub.numberOfPages = Math.ceil($scope.list.length / $scope.stub.itemsPerPage);
-            $scope.pages = (function() {
-              var _i, _ref, _results;
+            $scope.stub.currentPage = 0;
+            if ($scope.list) {
+              if ($scope.list.length > 0) {
+                $scope.stub.numberOfPages = Math.ceil($scope.list.length / $scope.stub.itemsPerPage);
+                $scope.pages = (function() {
+                  var _i, _ref, _results;
 
-              _results = [];
-              for (x = _i = 0, _ref = $scope.stub.numberOfPages - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; x = 0 <= _ref ? ++_i : --_i) {
-                _results.push(x);
+                  _results = [];
+                  for (x = _i = 0, _ref = $scope.stub.numberOfPages - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; x = 0 <= _ref ? ++_i : --_i) {
+                    _results.push(x);
+                  }
+                  return _results;
+                })();
+              } else {
+                $scope.stub.numberOfPages = 0;
+                $scope.pages = [];
               }
-              return _results;
-            })();
-            return $scope.stub.list = $scope.list;
+              return $scope.stub.list = $scope.list;
+            }
           };
           $scope.stub.fromPage = function() {
-            return $scope.stub.itemsPerPage * $scope.stub.currentPage - $scope.list.length;
+            if ($scope.list) {
+              return $scope.stub.itemsPerPage * $scope.stub.currentPage - $scope.list.length;
+            }
           };
           $scope.goToPage = function(page) {
             page = Math.max(0, page);
