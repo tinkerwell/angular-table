@@ -65,39 +65,63 @@ angular.module("angular-table").directive "atTable", ["attributeExtractor", (att
     if not attributes.pagination and not attributes.list
       throw "Either a list or pagination must be specified."
 
+  setupTr = (element, repeatString) ->
+    tbody = element.find "tbody"
+    tr = tbody.find "tr"
+    tr.attr("ng-repeat", repeatString)
+    tbody
+
+
+  StandardSetup = (attributes) ->
+    @repeatString = "item in #{attributes.list} | orderBy:predicate:descending"
+    @compile = (element, attributes, transclude) ->
+      setupTr element, @repeatString
+
+    @link = () ->
+    return
+
+  PaginationSetup = (attributes) ->
+    @repeatString = "item in #{attributes.pagination}.list | limitTo:fromPage() | limitTo:toPage() | orderBy:predicate:descending"
+
+    @compile = (element, attributes, transclude) ->
+      tbody = setupTr element, @repeatString
+
+      if typeof attributes.fillLastPage != "undefined"
+        tds = element.find("td")
+        tdString = ""
+        for td in tds
+          tdString += "<td>{{item}}&nbsp;</td>"
+
+        fillerTr = angular.element("<tr>#{tdString}</tr>")
+        fillerTr.attr("ng-repeat", "item in #{attributes.pagination}.getFillerArray() ")
+
+        tbody.append(fillerTr)
+
+    @link = ($scope, $element, $attributes) ->
+      paginationName = attributes.pagination
+      $scope.fromPage = () ->
+        if $scope[paginationName] then $scope[paginationName].fromPage()
+
+      $scope.toPage = () ->
+        if $scope[paginationName] then $scope[paginationName].itemsPerPage
+
+    return
+
+  createSetup = (attributes) ->
+    validateInput attributes
+    if attributes.list
+      return new StandardSetup(attributes)
+    if attributes.pagination
+      return new PaginationSetup(attributes)
+    return
+
   {
     restrict: "AC"
     scope: true
     compile: (element, attributes, transclude) ->
-
-      validateInput attributes
-
+      setup = createSetup attributes
       constructHeader(element)
-
-      # TODO: better handling of the following if/else stuff
-      paginationName = attributes.pagination
-
-      filterString = ""
-
-      if paginationName
-         filterString = "| limitTo:fromPage() | limitTo:toPage()"
-
-      listName = attributes.list || "#{paginationName}.list"
-
-      tbody = element.find "tbody"
-      tr = tbody.find "tr"
-      tr.attr("ng-repeat", "item in #{listName} #{filterString} | orderBy:predicate:descending")
-
-      # tds = element.find("td")
-      # tdString = ""
-      # for td in tds
-      #   tdString += "<td>{{item}}&nbsp;</td>"
-
-      # fillerTr = angular.element("<tr>#{tdString}</tr>")
-      # fillerTr.attr("ng-repeat", "item in #{paginationName}.getFillerArray() ")
-
-      # tbody.append(fillerTr)
-
+      setup.compile(element, attributes, transclude)
       {
         post: ($scope, $element, $attributes) ->
 
@@ -105,12 +129,7 @@ angular.module("angular-table").directive "atTable", ["attributeExtractor", (att
             return "icon-minus" if predicate != $scope.predicate
             if $scope.descending then "icon-chevron-down" else "icon-chevron-up"
 
-          $scope.fromPage = () ->
-            if $scope[paginationName] then $scope[paginationName].fromPage()
-
-          $scope.toPage = () ->
-            if $scope[paginationName] then $scope[paginationName].itemsPerPage
-
+          setup.link($scope, $element, $attributes)
       }
   }
 ]
