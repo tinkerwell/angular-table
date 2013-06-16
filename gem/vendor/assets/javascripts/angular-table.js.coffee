@@ -74,8 +74,6 @@ angular.module("angular-table").directive "atTable", ["attributeExtractor", (att
 
       constructHeader(element)
 
-
-
       # TODO: better handling of the following if/else stuff
       paginationName = attributes.pagination
 
@@ -89,6 +87,17 @@ angular.module("angular-table").directive "atTable", ["attributeExtractor", (att
       tbody = element.find "tbody"
       tr = tbody.find "tr"
       tr.attr("ng-repeat", "item in #{listName} #{filterString} | orderBy:predicate:descending")
+
+      tds = element.find("td")
+      tdString = ""
+      for td in tds
+        tdString += "<td>{{item}}&nbsp;</td>"
+
+
+      fillerTr = angular.element("<tr>#{tdString}</tr>")
+      fillerTr.attr("ng-repeat", "item in #{paginationName}.getFillerArray() ")
+
+      tbody.append(fillerTr)
 
       {
         post: ($scope, $element, $attributes) ->
@@ -162,6 +171,16 @@ angular.module("angular-table").directive "atPagination", ["attributeExtractor",
       $scope.stub.fromPage = () ->
         if $scope.list
           $scope.stub.itemsPerPage * $scope.stub.currentPage - $scope.list.length
+
+      $scope.stub.getFillerArray = () ->
+        if $scope.stub.currentPage == $scope.stub.numberOfPages - 1
+          itemCountOnLastPage = $scope.list.length % $scope.stub.itemsPerPage
+          if itemCountOnLastPage != 0
+            fillerLength = $scope.stub.itemsPerPage - itemCountOnLastPage - 1
+            x for x in [($scope.list.length)..($scope.list.length + fillerLength)]
+          else
+            []
+
 
       $scope.goToPage = (page) ->
         page = Math.max(0, page)
