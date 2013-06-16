@@ -2,7 +2,7 @@
 layout: default
 ---
 
-<angular-tabs active-tab="Implicit">
+<angular-tabs active-tab="Styling">
   <div title="Implicit">
     <h2>Random lorem <small>implicit cells, fixed widths, custom title</small></h2>
 
@@ -65,6 +65,38 @@ $scope.queryChanged = function(query) {
     <div ng-non-bindable>
     {% highlight html %}
 {% include filtering.html %}
+    {% endhighlight %}
+    </div>
+
+  </div>
+
+  <div title="Styling">
+    <h2>Styling <small>use your own css</small></h2>
+
+    {% include styling.html %}
+
+    <h3>Css</h3>
+    {% highlight css %}
+.custom-table-style {
+  width: 100%;
+}
+
+.custom-table-style td, .custom-table-style th {
+  color: white;
+  background-color: black;
+
+  border: solid;
+  border-color: red;
+
+  text-align: center;
+}
+    {% endhighlight %}
+
+    <h3>HTML</h3>
+
+    <div ng-non-bindable>
+    {% highlight html %}
+{% include styling.html %}
     {% endhighlight %}
     </div>
 
