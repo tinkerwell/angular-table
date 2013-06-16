@@ -91,7 +91,7 @@
         restrict: "AC",
         scope: true,
         compile: function(element, attributes, transclude) {
-          var fillerTr, filterString, listName, paginationName, tbody, td, tdString, tds, tr, _i, _len;
+          var filterString, listName, paginationName, tbody, tr;
 
           validateInput(attributes);
           constructHeader(element);
@@ -104,15 +104,6 @@
           tbody = element.find("tbody");
           tr = tbody.find("tr");
           tr.attr("ng-repeat", "item in " + listName + " " + filterString + " | orderBy:predicate:descending");
-          tds = element.find("td");
-          tdString = "";
-          for (_i = 0, _len = tds.length; _i < _len; _i++) {
-            td = tds[_i];
-            tdString += "<td>{{item}}&nbsp;</td>";
-          }
-          fillerTr = angular.element("<tr>" + tdString + "</tr>");
-          fillerTr.attr("ng-repeat", "item in " + paginationName + ".getFillerArray() ");
-          tbody.append(fillerTr);
           return {
             post: function($scope, $element, $attributes) {
               $scope.getSortIcon = function(predicate) {
