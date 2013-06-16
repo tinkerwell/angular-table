@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = AngularTable::VERSION
   spec.authors       = ["Samuel Mueller"]
   spec.email         = ["mueller.samu@gmail.com"]
-  spec.description   = %q{angular-table}
-  spec.summary       = %q{angular-table}
-  spec.homepage      = ""
+  spec.description   = "Lets you declare sortable, pageable tables with minimal effort while providing high flexibilty."
+  spec.summary       = spec.description
+  spec.homepage      = "https://github.com/ssmm/angular-table"
   spec.license       = "MIT"
 
   spec.files         = Dir["lib/**/*"] + Dir["vendor/**/*"] + ["../README.md", "../LICENSE.txt"]
