@@ -1,6 +1,6 @@
 // author: Samuel Mueller 
 // homepage: http://github.com/ssmm/angular-table 
-// version: 0.0.1 
+// version: 0.0.2 
 (function() {
   angular.module("angular-table", []);
 
