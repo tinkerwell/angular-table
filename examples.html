@@ -4,79 +4,112 @@ layout: default
 
 <angular-tabs active-tab="Implicit">
   <div title="Implicit">
-    <h2>Random lorem <small>implicit cells, fixed widths, custom title</small></h2>
-
-    {% include implicit.html %}
-
-    <h3>HTML</h3>
-
-    <div ng-non-bindable>
-    {% highlight html %}
+    <div class="row-fluid">
+      <div class="span12">
+        <h2>implicit cells, fixed widths, custom title</h2>
+      </div>
+    </div>
+    <div class="row-fluid"><div class="span12"></div></div>
+    <div class="row-fluid">
+      <div class="span5">
+        {% include implicit.html %}
+      </div>
+      <div class="span7">
+        <div ng-non-bindable>
+{% highlight html %}
 {% include implicit.html %}
-    {% endhighlight %}
+{% endhighlight %}
+        </div>
+      </div>
     </div>
   </div>
 
-  <div title="SortingPaging">
-    <h2>Lots of random lorem <small>sorting, paging, custom cells</small></h2>
-
-    {% include sorting_paging.html %}
-
-    <h3>HTML</h3>
-
-    <div ng-non-bindable>
-    {% highlight html %}
+  <div title="Sorting / Pagination">
+    <div class="row-fluid">
+      <div class="span12">
+        <h2>sorting, pagination, custom cells</h2>
+      </div>
+    </div>
+    <div class="row-fluid"><div class="span12"></div></div>
+    <div class="row-fluid">
+      <div class="span5">
+        {% include sorting_paging.html %}
+      </div>
+      <div class="span7">
+        <div ng-non-bindable>
+{% highlight html %}
 {% include sorting_paging.html %}
-    {% endhighlight %}
+{% endhighlight %}
+        </div>
+      </div>
     </div>
   </div>
 
   <div title="Custom">
-    <h2>Lorem vowels <small>custom header, custom cells</small></h2>
-
-    {% include custom.html %}
-
-    <h3>HTML</h3>
-
-    <div ng-non-bindable>
-    {% highlight html %}
+    <div class="row-fluid">
+      <div class="span12">
+        <h2>custom header, custom cells</h2>
+      </div>
+    </div>
+    <div class="row-fluid"><div class="span12"></div></div>
+    <div class="row-fluid">
+      <div class="span5">
+        {% include custom.html %}
+      </div>
+      <div class="span7">
+        <div ng-non-bindable>
+{% highlight html %}
 {% include custom.html %}
-    {% endhighlight %}
+{% endhighlight %}
+        </div>
+      </div>
     </div>
   </div>
 
   <div title="Filtering">
-    <h2>Filtering <small>filtering</small></h2>
-
-    {% include filtering.html %}
-
-    <h3>In the controller</h3>
-
-    {% highlight javascript%}
+    <div class="row-fluid">
+      <div class="span12">
+        <h2>filtering</h2>
+      </div>
+    </div>
+    <div class="row-fluid"><div class="span12"></div></div>
+    <div class="row-fluid">
+      <div class="span5">
+        {% include filtering.html %}
+      </div>
+      <div class="span7">
+{% highlight javascript%}
 $scope.filteredList = $scope.longLoremList
 
 $scope.queryChanged = function(query) {
   $scope.filteredList = $filter("filter")($scope.longLoremList, query);
 };
-    {% endhighlight %}
+{% endhighlight %}
 
-    <h3>HTML</h3>
 
-    <div ng-non-bindable>
-    {% highlight html %}
+        <div ng-non-bindable>
+{% highlight html %}
 {% include filtering.html %}
-    {% endhighlight %}
+{% endhighlight %}
+        </div>
+      </div>
     </div>
 
   </div>
 
   <div title="Styling">
-    <h2>Styling <small>use your own css</small></h2>
-
-    {% include styling.html %}
-
-    <h3>Css</h3>
-    {% highlight css %}
+    <div class="row-fluid">
+      <div class="span12">
+        <h2>use your own css</h2>
+      </div>
+    </div>
+    <div class="row-fluid"><div class="span12"></div></div>
+    <div class="row-fluid">
+      <div class="span5">
+        {% include styling.html %}
+      </div>
+      <div class="span7">
+{% highlight css %}
 .custom-table-style {
   width: 100%;
 }
@@ -90,15 +123,14 @@ $scope.queryChanged = function(query) {
 
   text-align: center;
 }
-    {% endhighlight %}
+{% endhighlight %}
 
-    <h3>HTML</h3>
-
-    <div ng-non-bindable>
-    {% highlight html %}
+        <div ng-non-bindable>
+{% highlight html %}
 {% include styling.html %}
-    {% endhighlight %}
+{% endhighlight %}
+        </div>
+      </div>
     </div>
-
   </div>
 </angular-tabs>

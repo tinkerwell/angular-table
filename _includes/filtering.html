@@ -1,12 +1,13 @@
 {% raw %}
-<input type="text" ng-model="query" ng-change="queryChanged(query)">
+
+<input placeholder="Search..." type="text" ng-model="query" ng-change="queryChanged(query)">
 
 <table at-table class="table table-striped table-bordered" pagination="filteringPagination" fill-last-page>
   <thead></thead>
   <tbody>
     <tr>
       <td at-implicit class="50px" attribute="id"></td>
-      <td at-implicit class="350px" attribute="description"></td>
+      <td at-implicit class="110px" attribute="description"></td>
       <td title="length" attribute="lengthOfDescription">
         The length of the word '{{item.description}}' is {{item.description.length}}
       </td>
