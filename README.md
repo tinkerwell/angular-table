@@ -2,7 +2,9 @@
 
 Lets you declare sortable, pageable tables with minimal effort while providing high flexibilty.
 
-[Written in CoffeeScript.](https://github.com/ssmm/angular-table/blob/master/gem/vendor/assets/javascripts/angular-table.js.coffee)
+Check out the [examples](http://ssmm.github.io/angular-table/examples.html) for more information.
+
+[Written](https://github.com/ssmm/angular-table/blob/master/gem/vendor/assets/javascripts/angular-table.js.coffee) in CoffeeScript.
 
 ## How
 
@@ -31,4 +33,3 @@ Defining a table is 100% declarative. Here's a simple example:
 </table>
 ```
 
-Check out the [examples](http://ssmm.github.io/angular-table/examples.html) for more information.
