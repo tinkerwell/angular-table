@@ -1,6 +1,6 @@
 // author: Samuel Mueller 
 // homepage: http://github.com/ssmm/angular-table 
-// version: 0.0.2 
+// version: 0.0.3 
 (function() {
   angular.module("angular-table", []);
 
@@ -37,47 +37,47 @@
 
   angular.module("angular-table").directive("atTable", [
     "attributeExtractor", function(attributeExtractor) {
-      var PaginationSetup, StandardSetup, capitaliseFirstLetter, constructHeader, createSetup, setupTr, validateInput;
+      var PaginationSetup, StandardSetup, capitaliseFirstLetter, constructHeader, createSetup, limitToExpression, orderByExpression, setupTr, validateInput;
 
       capitaliseFirstLetter = function(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-      };
-      constructHeader = function(element) {
-        var attribute, existing_ths, icon, sortable, td, tds, th, thead, title, tr, width, _i, _j, _len, _len1, _ref;
-
-        thead = element.find("thead");
-        if (thead[0]) {
-          tr = thead.find("tr");
-          existing_ths = {};
-          _ref = tr.find("th");
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            th = _ref[_i];
-            th = angular.element(th);
-            existing_ths[th.attr("attribute")] = th.html();
-          }
-          tr.remove();
-          tr = $("<tr></tr>");
-          tds = element.find("td");
-          for (_j = 0, _len1 = tds.length; _j < _len1; _j++) {
-            td = tds[_j];
-            td = angular.element(td);
-            attribute = attributeExtractor.extractAttribute(td);
-            th = $("<th style='cursor: pointer; -webkit-user-select: none;'></th>");
-            title = existing_ths[attribute] || capitaliseFirstLetter(attributeExtractor.extractTitle(td));
-            th.html("" + title);
-            sortable = td[0].attributes.sortable || attributeExtractor.isSortable(td.attr("class"));
-            if (sortable) {
-              th.attr("ng-click", "predicate = '" + attribute + "'; descending = !descending;");
-              icon = angular.element("<i style='margin-left: 10px;'></i>");
-              icon.attr("ng-class", "getSortIcon('" + attribute + "')");
-              th.append(icon);
-            }
-            width = attributeExtractor.extractWidth(td.attr("class"));
-            th.attr("width", width);
-            tr.append(th);
-          }
-          return thead.append(tr);
+        if (string) {
+          return string.charAt(0).toUpperCase() + string.slice(1);
+        } else {
+          return "";
         }
+      };
+      constructHeader = function(thead, tds) {
+        var attribute, existingThMarkup, icon, sortable, td, th, title, tr, width, _i, _j, _len, _len1, _ref;
+
+        tr = thead.find("tr");
+        existingThMarkup = {};
+        _ref = tr.find("th");
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          th = _ref[_i];
+          th = angular.element(th);
+          existingThMarkup[th.attr("attribute")] = th.html();
+        }
+        tr.remove();
+        tr = angular.element("<tr></tr>");
+        for (_j = 0, _len1 = tds.length; _j < _len1; _j++) {
+          td = tds[_j];
+          td = angular.element(td);
+          attribute = attributeExtractor.extractAttribute(td);
+          th = angular.element("<th style='cursor: pointer;'></th>");
+          title = existingThMarkup[attribute] || capitaliseFirstLetter(attributeExtractor.extractTitle(td));
+          th.html("" + title);
+          sortable = td[0].attributes.sortable || attributeExtractor.isSortable(td.attr("class"));
+          if (sortable) {
+            th.attr("ng-click", "predicate = '" + attribute + "'; descending = !descending;");
+            icon = angular.element("<i style='margin-left: 10px;'></i>");
+            icon.attr("ng-class", "getSortIcon('" + attribute + "')");
+            th.append(icon);
+          }
+          width = attributeExtractor.extractWidth(td.attr("class"));
+          th.attr("width", width);
+          tr.append(th);
+        }
+        return thead.append(tr);
       };
       validateInput = function(attributes) {
         if (attributes.pagination && attributes.list) {
@@ -95,15 +95,26 @@
         tr.attr("ng-repeat", repeatString);
         return tbody;
       };
+      orderByExpression = "| orderBy:predicate:descending";
+      limitToExpression = "| limitTo:fromPage() | limitTo:toPage()";
       StandardSetup = function(attributes) {
-        this.repeatString = "item in " + attributes.list + " | orderBy:predicate:descending";
+        this.repeatString = "item in " + attributes.list + " " + orderByExpression;
         this.compile = function(element, attributes, transclude) {
           return setupTr(element, this.repeatString);
         };
         this.link = function() {};
       };
       PaginationSetup = function(attributes) {
-        this.repeatString = "item in " + attributes.pagination + ".list | limitTo:fromPage() | limitTo:toPage() | orderBy:predicate:descending";
+        var sortContext;
+
+        sortContext = attributes.sortContext || "global";
+        if (sortContext === "global") {
+          this.repeatString = "item in " + attributes.pagination + ".list " + orderByExpression + " " + limitToExpression;
+        } else if (sortContext === "page") {
+          this.repeatString = "item in " + attributes.pagination + ".list " + limitToExpression + " " + orderByExpression + " ";
+        } else {
+          throw "Invalid sort-context: " + sortContext + ".";
+        }
         this.compile = function(element, attributes, transclude) {
           var fillerTr, tbody, td, tdString, tds, _i, _len;
 
@@ -113,7 +124,7 @@
             tdString = "";
             for (_i = 0, _len = tds.length; _i < _len; _i++) {
               td = tds[_i];
-              tdString += "<td>{{item}}&nbsp;</td>";
+              tdString += "<td>&nbsp;</td>";
             }
             fillerTr = angular.element("<tr>" + tdString + "</tr>");
             fillerTr.attr("ng-repeat", "item in " + attributes.pagination + ".getFillerArray() ");
@@ -149,10 +160,14 @@
         restrict: "AC",
         scope: true,
         compile: function(element, attributes, transclude) {
-          var setup;
+          var setup, tds, thead;
 
           setup = createSetup(attributes);
-          constructHeader(element);
+          thead = element.find("thead");
+          tds = element.find("td");
+          if (thead[0]) {
+            constructHeader(thead, tds);
+          }
           setup.compile(element, attributes, transclude);
           return {
             post: function($scope, $element, $attributes) {
