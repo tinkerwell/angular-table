@@ -4,8 +4,6 @@ Lets you declare sortable, pageable tables with minimal effort while providing h
 
 Check out the [examples](http://ssmm.github.io/angular-table/examples.html) for more information.
 
-[Written](https://github.com/ssmm/angular-table/blob/master/gem/vendor/assets/javascripts/angular-table.js.coffee) in CoffeeScript.
-
 ## How
 
 All you have to do in your controller is setting up a list on your `$scope`:
@@ -33,3 +31,4 @@ Defining a table is 100% declarative. Here's a simple example:
 </table>
 ```
 
+[Written in CoffeeScript.](https://github.com/ssmm/angular-table/blob/master/gem/vendor/assets/javascripts/angular-table.js.coffee)
