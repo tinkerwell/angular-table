@@ -82,7 +82,14 @@ angular.module("angular-table").directive "atTable", ["attributeExtractor", (att
 
   PaginationSetup = (attributes) ->
 
-    @repeatString = "item in #{attributes.pagination}.list #{orderByExpression} #{limitToExpression}"
+    sortContext = attributes.sortContext || "global"
+
+    if sortContext == "global"
+      @repeatString = "item in #{attributes.pagination}.list #{orderByExpression} #{limitToExpression}"
+    else if sortContext == "page"
+      @repeatString = "item in #{attributes.pagination}.list #{limitToExpression} #{orderByExpression} "
+    else
+      throw "Invalid sort-context: #{sortContext}."
 
     @compile = (element, attributes, transclude) ->
       tbody = setupTr element, @repeatString
