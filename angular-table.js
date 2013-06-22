@@ -1,83 +1,33 @@
-// author: Samuel Mueller 
+// author:   Samuel Mueller 
+// version:  0.0.4 
+// license:  MIT 
 // homepage: http://github.com/ssmm/angular-table 
-// version: 0.0.3 
 (function() {
   angular.module("angular-table", []);
 
-  angular.module("angular-table").service("attributeExtractor", function() {
-    return {
-      extractWidth: function(classes) {
-        var width;
-
-        width = /([0-9]+px)/i.exec(classes);
-        if (width) {
-          return width[0];
-        } else {
-          return "";
-        }
-      },
-      isSortable: function(classes) {
-        var sortable;
-
-        sortable = /(sortable)/i.exec(classes);
-        if (sortable) {
-          return true;
-        } else {
-          return false;
-        }
-      },
-      extractTitle: function(td) {
-        return td.attr("title") || td.attr("attribute");
-      },
-      extractAttribute: function(td) {
-        return td.attr("attribute");
-      }
-    };
-  });
-
   angular.module("angular-table").directive("atTable", [
-    "attributeExtractor", function(attributeExtractor) {
-      var PaginationSetup, StandardSetup, capitaliseFirstLetter, constructHeader, createSetup, limitToExpression, orderByExpression, setupTr, validateInput;
+    "metaCollector", "setupFactory", function(metaCollector, setupFactory) {
+      var constructHeader, validateInput;
 
-      capitaliseFirstLetter = function(string) {
-        if (string) {
-          return string.charAt(0).toUpperCase() + string.slice(1);
-        } else {
-          return "";
-        }
-      };
-      constructHeader = function(thead, tds) {
-        var attribute, existingThMarkup, icon, sortable, td, th, title, tr, width, _i, _j, _len, _len1, _ref;
+      constructHeader = function(customHeaderMarkup, bodyDefinitions) {
+        var icon, td, th, title, tr, _i, _len;
 
-        tr = thead.find("tr");
-        existingThMarkup = {};
-        _ref = tr.find("th");
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          th = _ref[_i];
-          th = angular.element(th);
-          existingThMarkup[th.attr("attribute")] = th.html();
-        }
-        tr.remove();
         tr = angular.element("<tr></tr>");
-        for (_j = 0, _len1 = tds.length; _j < _len1; _j++) {
-          td = tds[_j];
-          td = angular.element(td);
-          attribute = attributeExtractor.extractAttribute(td);
+        for (_i = 0, _len = bodyDefinitions.length; _i < _len; _i++) {
+          td = bodyDefinitions[_i];
           th = angular.element("<th style='cursor: pointer;'></th>");
-          title = existingThMarkup[attribute] || capitaliseFirstLetter(attributeExtractor.extractTitle(td));
+          title = customHeaderMarkup[td.attribute] || td.title;
           th.html("" + title);
-          sortable = td[0].attributes.sortable || attributeExtractor.isSortable(td.attr("class"));
-          if (sortable) {
-            th.attr("ng-click", "predicate = '" + attribute + "'; descending = !descending;");
+          if (td.sortable) {
+            th.attr("ng-click", "predicate = '" + td.attribute + "'; descending = !descending;");
             icon = angular.element("<i style='margin-left: 10px;'></i>");
-            icon.attr("ng-class", "getSortIcon('" + attribute + "')");
+            icon.attr("ng-class", "getSortIcon('" + td.attribute + "')");
             th.append(icon);
           }
-          width = attributeExtractor.extractWidth(td.attr("class"));
-          th.attr("width", width);
+          th.attr("width", td.width);
           tr.append(th);
         }
-        return thead.append(tr);
+        return tr;
       };
       validateInput = function(attributes) {
         if (attributes.pagination && attributes.list) {
@@ -87,90 +37,31 @@
           throw "Either a list or pagination must be specified.";
         }
       };
-      setupTr = function(element, repeatString) {
-        var tbody, tr;
-
-        tbody = element.find("tbody");
-        tr = tbody.find("tr");
-        tr.attr("ng-repeat", repeatString);
-        return tbody;
-      };
-      orderByExpression = "| orderBy:predicate:descending";
-      limitToExpression = "| limitTo:fromPage() | limitTo:toPage()";
-      StandardSetup = function(attributes) {
-        this.repeatString = "item in " + attributes.list + " " + orderByExpression;
-        this.compile = function(element, attributes, transclude) {
-          return setupTr(element, this.repeatString);
-        };
-        this.link = function() {};
-      };
-      PaginationSetup = function(attributes) {
-        var sortContext;
-
-        sortContext = attributes.sortContext || "global";
-        if (sortContext === "global") {
-          this.repeatString = "item in " + attributes.pagination + ".list " + orderByExpression + " " + limitToExpression;
-        } else if (sortContext === "page") {
-          this.repeatString = "item in " + attributes.pagination + ".list " + limitToExpression + " " + orderByExpression + " ";
-        } else {
-          throw "Invalid sort-context: " + sortContext + ".";
-        }
-        this.compile = function(element, attributes, transclude) {
-          var fillerTr, tbody, td, tdString, tds, _i, _len;
-
-          tbody = setupTr(element, this.repeatString);
-          if (typeof attributes.fillLastPage !== "undefined") {
-            tds = element.find("td");
-            tdString = "";
-            for (_i = 0, _len = tds.length; _i < _len; _i++) {
-              td = tds[_i];
-              tdString += "<td>&nbsp;</td>";
-            }
-            fillerTr = angular.element("<tr>" + tdString + "</tr>");
-            fillerTr.attr("ng-repeat", "item in " + attributes.pagination + ".getFillerArray() ");
-            return tbody.append(fillerTr);
-          }
-        };
-        this.link = function($scope, $element, $attributes) {
-          var paginationName;
-
-          paginationName = attributes.pagination;
-          $scope.fromPage = function() {
-            if ($scope[paginationName]) {
-              return $scope[paginationName].fromPage();
-            }
-          };
-          return $scope.toPage = function() {
-            if ($scope[paginationName]) {
-              return $scope[paginationName].itemsPerPage;
-            }
-          };
-        };
-      };
-      createSetup = function(attributes) {
-        validateInput(attributes);
-        if (attributes.list) {
-          return new StandardSetup(attributes);
-        }
-        if (attributes.pagination) {
-          return new PaginationSetup(attributes);
-        }
-      };
       return {
         restrict: "AC",
         scope: true,
         compile: function(element, attributes, transclude) {
-          var setup, tds, thead;
+          var bodyDefinition, customHeaderMarkup, setup, tbody, tds, thead, tr;
 
-          setup = createSetup(attributes);
+          validateInput(attributes);
           thead = element.find("thead");
+          tbody = element.find("tbody");
           tds = element.find("td");
           if (thead[0]) {
-            constructHeader(thead, tds);
+            customHeaderMarkup = metaCollector.collectCustomHeaderMarkup(thead);
+            bodyDefinition = metaCollector.collectBodyDefinition(tbody);
+            tr = thead.find("tr");
+            tr.remove();
+            thead.append(constructHeader(customHeaderMarkup, bodyDefinition.tds));
           }
+          setup = setupFactory(attributes);
           setup.compile(element, attributes, transclude);
           return {
             post: function($scope, $element, $attributes) {
+              if (bodyDefinition.initialSorting) {
+                $scope.predicate = bodyDefinition.initialSorting.predicate;
+                $scope.descending = bodyDefinition.initialSorting.direction === "desc";
+              }
               $scope.getSortIcon = function(predicate) {
                 if (predicate !== $scope.predicate) {
                   return "icon-minus";
@@ -190,13 +81,16 @@
   ]);
 
   angular.module("angular-table").directive("atImplicit", [
-    "attributeExtractor", function(attributeExtractor) {
+    function() {
       return {
         restrict: "AC",
         compile: function(element, attributes, transclude) {
           var attribute;
 
-          attribute = attributeExtractor.extractAttribute(element);
+          attribute = element.attr("attribute");
+          if (!attribute) {
+            throw "at-implicit specified without attribute: " + (element.html());
+          }
           return element.append("{{item." + attribute + "}}");
         }
       };
@@ -204,7 +98,7 @@
   ]);
 
   angular.module("angular-table").directive("atPagination", [
-    "attributeExtractor", function(attributeExtractor) {
+    function() {
       return {
         replace: true,
         restrict: "E",
@@ -271,6 +165,176 @@
           return $scope.$watch("list", function() {
             return $scope.update();
           });
+        }
+      };
+    }
+  ]);
+
+  angular.module("angular-table").service("metaCollector", [
+    function() {
+      var capitaliseFirstLetter, extractWidth, getInitialSortDirection, isSortable;
+
+      capitaliseFirstLetter = function(string) {
+        if (string) {
+          return string.charAt(0).toUpperCase() + string.slice(1);
+        } else {
+          return "";
+        }
+      };
+      extractWidth = function(classes) {
+        var width;
+
+        width = /([0-9]+px)/i.exec(classes);
+        if (width) {
+          return width[0];
+        } else {
+          return "";
+        }
+      };
+      isSortable = function(classes) {
+        var sortable;
+
+        sortable = /(sortable)/i.exec(classes);
+        if (sortable) {
+          return true;
+        } else {
+          return false;
+        }
+      };
+      getInitialSortDirection = function(td) {
+        var initialSorting;
+
+        initialSorting = td.attr("initial-sorting");
+        if (initialSorting) {
+          if (initialSorting === "asc" || initialSorting === "desc") {
+            return initialSorting;
+          }
+          throw "Invalid value for initial-sorting: " + initialSorting + ". Allowed values are 'asc' or 'desc'.";
+        }
+        return void 0;
+      };
+      return {
+        collectCustomHeaderMarkup: function(thead) {
+          var customHeaderMarkup, th, tr, _i, _len, _ref;
+
+          customHeaderMarkup = {};
+          tr = thead.find("tr");
+          _ref = tr.find("th");
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            th = _ref[_i];
+            th = angular.element(th);
+            customHeaderMarkup[th.attr("attribute")] = th.html();
+          }
+          return customHeaderMarkup;
+        },
+        collectBodyDefinition: function(tbody) {
+          var attribute, bodyDefinition, initialSortDirection, sortable, td, title, width, _i, _len, _ref;
+
+          bodyDefinition = {};
+          bodyDefinition.tds = [];
+          bodyDefinition.initialSorting = void 0;
+          _ref = tbody.find("td");
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            td = _ref[_i];
+            td = angular.element(td);
+            attribute = td.attr("attribute");
+            title = td.attr("title") || capitaliseFirstLetter(td.attr("attribute"));
+            sortable = td[0].attributes.sortable || isSortable(td.attr("class"));
+            width = extractWidth(td.attr("class"));
+            bodyDefinition.tds.push({
+              attribute: attribute,
+              title: title,
+              sortable: sortable,
+              width: width
+            });
+            initialSortDirection = getInitialSortDirection(td);
+            if (initialSortDirection) {
+              if (!attribute) {
+                throw "initial-sorting specified without attribute.";
+              }
+              bodyDefinition.initialSorting = {};
+              bodyDefinition.initialSorting.direction = initialSortDirection;
+              bodyDefinition.initialSorting.predicate = attribute;
+            }
+          }
+          return bodyDefinition;
+        }
+      };
+    }
+  ]);
+
+  angular.module("angular-table").factory("setupFactory", [
+    function() {
+      var PaginationSetup, StandardSetup, limitToExpression, orderByExpression, setupTr;
+
+      orderByExpression = "| orderBy:predicate:descending";
+      limitToExpression = "| limitTo:fromPage() | limitTo:toPage()";
+      setupTr = function(element, repeatString) {
+        var tbody, tr;
+
+        tbody = element.find("tbody");
+        tr = tbody.find("tr");
+        tr.attr("ng-repeat", repeatString);
+        return tbody;
+      };
+      StandardSetup = function(attributes) {
+        var repeatString;
+
+        repeatString = "item in " + attributes.list + " " + orderByExpression;
+        this.compile = function(element, attributes, transclude) {
+          return setupTr(element, repeatString);
+        };
+        this.link = function() {};
+      };
+      PaginationSetup = function(attributes) {
+        var repeatString, sortContext;
+
+        sortContext = attributes.sortContext || "global";
+        if (sortContext === "global") {
+          repeatString = "item in " + attributes.pagination + ".list " + orderByExpression + " " + limitToExpression;
+        } else if (sortContext === "page") {
+          repeatString = "item in " + attributes.pagination + ".list " + limitToExpression + " " + orderByExpression + " ";
+        } else {
+          throw "Invalid sort-context: " + sortContext + ".";
+        }
+        this.compile = function(element, attributes, transclude) {
+          var fillerTr, tbody, td, tdString, tds, _i, _len;
+
+          tbody = setupTr(element, repeatString);
+          if (typeof attributes.fillLastPage !== "undefined") {
+            tds = element.find("td");
+            tdString = "";
+            for (_i = 0, _len = tds.length; _i < _len; _i++) {
+              td = tds[_i];
+              tdString += "<td>&nbsp;</td>";
+            }
+            fillerTr = angular.element("<tr>" + tdString + "</tr>");
+            fillerTr.attr("ng-repeat", "item in " + attributes.pagination + ".getFillerArray() ");
+            return tbody.append(fillerTr);
+          }
+        };
+        this.link = function($scope, $element, $attributes) {
+          var paginationName;
+
+          paginationName = attributes.pagination;
+          $scope.fromPage = function() {
+            if ($scope[paginationName]) {
+              return $scope[paginationName].fromPage();
+            }
+          };
+          return $scope.toPage = function() {
+            if ($scope[paginationName]) {
+              return $scope[paginationName].itemsPerPage;
+            }
+          };
+        };
+      };
+      return function(attributes) {
+        if (attributes.list) {
+          return new StandardSetup(attributes);
+        }
+        if (attributes.pagination) {
+          return new PaginationSetup(attributes);
         }
       };
     }
