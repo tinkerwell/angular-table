@@ -95,7 +95,7 @@
             $scope.filteredList = $scope.longLoremList
 
             $scope.queryChanged = function(query) {
-              return $scope.filteredList = $filter("filter")($scope.longLoremList, query);
+              $scope.filteredList = $filter("filter")($scope.longLoremList, query);
             };
 
             var vowels = ["a", "e", "i", "o", "u"];
