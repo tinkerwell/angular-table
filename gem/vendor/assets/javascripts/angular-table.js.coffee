@@ -23,41 +23,38 @@ angular.module("angular-table").service "attributeExtractor", () ->
 angular.module("angular-table").directive "atTable", ["attributeExtractor", (attributeExtractor) ->
 
   capitaliseFirstLetter = (string) ->
-    string.charAt(0).toUpperCase() + string.slice(1)
+    if string then string.charAt(0).toUpperCase() + string.slice(1) else ""
 
-  constructHeader = (element) ->
-    thead = element.find "thead"
 
-    if thead[0]
-      tr = thead.find "tr"
-      existing_ths = {}
-      for th in tr.find "th"
-        th = angular.element(th)
-        existing_ths[th.attr("attribute")] = th.html()
+  constructHeader = (thead, tds) ->
+    tr = thead.find "tr"
+    existingThMarkup = {}
+    for th in tr.find "th"
+      th = angular.element(th)
+      existingThMarkup[th.attr("attribute")] = th.html()
 
-      tr.remove()
-      tr = $("<tr></tr>")
+    tr.remove()
+    tr = angular.element("<tr></tr>")
 
-      tds = element.find("td")
-      for td in tds
-        td = angular.element(td)
-        attribute = attributeExtractor.extractAttribute(td)
-        th = $("<th style='cursor: pointer; -webkit-user-select: none;'></th>")
-        title = existing_ths[attribute] || capitaliseFirstLetter(attributeExtractor.extractTitle(td))
-        th.html("#{title}")
+    for td in tds
+      td = angular.element(td)
+      attribute = attributeExtractor.extractAttribute(td)
+      th = angular.element("<th style='cursor: pointer;'></th>")
+      title = existingThMarkup[attribute] || capitaliseFirstLetter(attributeExtractor.extractTitle(td))
+      th.html("#{title}")
 
-        sortable = td[0].attributes.sortable || attributeExtractor.isSortable(td.attr("class"))
-        if sortable
-          th.attr("ng-click", "predicate = '#{attribute}'; descending = !descending;")
-          icon = angular.element("<i style='margin-left: 10px;'></i>")
-          icon.attr("ng-class", "getSortIcon('#{attribute}')")
-          th.append(icon)
+      sortable = td[0].attributes.sortable || attributeExtractor.isSortable(td.attr("class"))
+      if sortable
+        th.attr("ng-click", "predicate = '#{attribute}'; descending = !descending;")
+        icon = angular.element("<i style='margin-left: 10px;'></i>")
+        icon.attr("ng-class", "getSortIcon('#{attribute}')")
+        th.append(icon)
 
-        width = attributeExtractor.extractWidth(td.attr("class"))
-        th.attr("width", width)
-        tr.append(th)
+      width = attributeExtractor.extractWidth(td.attr("class"))
+      th.attr("width", width)
+      tr.append(th)
 
-      thead.append tr
+    thead.append tr
 
   validateInput = (attributes) ->
     if attributes.pagination and attributes.list
@@ -72,8 +69,11 @@ angular.module("angular-table").directive "atTable", ["attributeExtractor", (att
     tbody
 
 
+  orderByExpression = "| orderBy:predicate:descending"
+  limitToExpression = "| limitTo:fromPage() | limitTo:toPage()"
+
   StandardSetup = (attributes) ->
-    @repeatString = "item in #{attributes.list} | orderBy:predicate:descending"
+    @repeatString = "item in #{attributes.list} #{orderByExpression}"
     @compile = (element, attributes, transclude) ->
       setupTr element, @repeatString
 
@@ -81,7 +81,8 @@ angular.module("angular-table").directive "atTable", ["attributeExtractor", (att
     return
 
   PaginationSetup = (attributes) ->
-    @repeatString = "item in #{attributes.pagination}.list | limitTo:fromPage() | limitTo:toPage() | orderBy:predicate:descending"
+
+    @repeatString = "item in #{attributes.pagination}.list #{orderByExpression} #{limitToExpression}"
 
     @compile = (element, attributes, transclude) ->
       tbody = setupTr element, @repeatString
@@ -90,7 +91,7 @@ angular.module("angular-table").directive "atTable", ["attributeExtractor", (att
         tds = element.find("td")
         tdString = ""
         for td in tds
-          tdString += "<td>{{item}}&nbsp;</td>"
+          tdString += "<td>&nbsp;</td>"
 
         fillerTr = angular.element("<tr>#{tdString}</tr>")
         fillerTr.attr("ng-repeat", "item in #{attributes.pagination}.getFillerArray() ")
@@ -120,7 +121,11 @@ angular.module("angular-table").directive "atTable", ["attributeExtractor", (att
     scope: true
     compile: (element, attributes, transclude) ->
       setup = createSetup attributes
-      constructHeader(element)
+
+      thead = element.find "thead"
+      tds = element.find "td"
+      constructHeader(thead, tds) if thead[0]
+
       setup.compile(element, attributes, transclude)
       {
         post: ($scope, $element, $attributes) ->
@@ -195,7 +200,6 @@ angular.module("angular-table").directive "atPagination", ["attributeExtractor",
             x for x in [($scope.list.length)..($scope.list.length + fillerLength)]
           else
             []
-
 
       $scope.goToPage = (page) ->
         page = Math.max(0, page)
