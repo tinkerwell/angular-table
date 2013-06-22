@@ -34,8 +34,8 @@ angular.module("angular-table").directive "atPagination", [() ->
             $scope.pages = for x in [0..($scope.numberOfPages - 1)]
               x
           else
-            $scope.numberOfPages = 0
-            $scope.pages = []
+            $scope.numberOfPages = 1
+            $scope.pages = [0]
           $scope.list = $scope.list
 
       $scope.fromPage = () ->
@@ -45,7 +45,7 @@ angular.module("angular-table").directive "atPagination", [() ->
       $scope.getFillerArray = () ->
         if $scope.currentPage == $scope.numberOfPages - 1
           itemCountOnLastPage = $scope.list.length % $scope.itemsPerPage
-          if itemCountOnLastPage != 0
+          if itemCountOnLastPage != 0 || $scope.list.length == 0
             fillerLength = $scope.itemsPerPage - itemCountOnLastPage - 1
             x for x in [($scope.list.length)..($scope.list.length + fillerLength)]
           else
