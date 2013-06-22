@@ -11,6 +11,13 @@ angular.module("angular-table").service "metaCollector", [() ->
     sortable = /(sortable)/i.exec classes
     if sortable then true else false
 
+  getInitialSortDirection = (td) ->
+    initialSorting = td.attr("initial-sorting")
+    if initialSorting
+      return initialSorting if initialSorting == "asc" || initialSorting == "desc"
+      throw "Invalid value for initial-sorting: #{initialSorting}. Allowed values are 'asc' or 'desc'."
+    return undefined
+
   {
     collectCustomHeaderMarkup: (thead) ->
       customHeaderMarkup = {}
@@ -22,11 +29,12 @@ angular.module("angular-table").service "metaCollector", [() ->
 
       customHeaderMarkup
 
-    collectBodyDefinitions: (tbody) ->
-      bodyDefinitions = []
+    collectBodyDefinition: (tbody) ->
+      bodyDefinition = {}
+      bodyDefinition.tds = []
+      bodyDefinition.initialSorting = undefined
 
-      tds = tbody.find "td"
-      for td in tds
+      for td in tbody.find("td")
         td = angular.element(td)
 
         attribute = td.attr("attribute")
@@ -34,9 +42,17 @@ angular.module("angular-table").service "metaCollector", [() ->
         sortable = td[0].attributes.sortable || isSortable(td.attr("class"))
         width = extractWidth(td.attr("class"))
 
-        bodyDefinitions.push {attribute: attribute, title: title, sortable: sortable, width: width}
+        bodyDefinition.tds.push {attribute: attribute, title: title, sortable: sortable, width: width}
 
-      bodyDefinitions
+        initialSortDirection = getInitialSortDirection td
+        if initialSortDirection
+          throw "initial-sorting specified without attribute." if not attribute
+          bodyDefinition.initialSorting = {}
+          bodyDefinition.initialSorting.direction = initialSortDirection
+          bodyDefinition.initialSorting.predicate = attribute
+
+
+      bodyDefinition
 
   }
 ]
