@@ -128,8 +128,8 @@
                   return _results;
                 })();
               } else {
-                $scope.numberOfPages = 0;
-                $scope.pages = [];
+                $scope.numberOfPages = 1;
+                $scope.pages = [0];
               }
               return $scope.list = $scope.list;
             }
@@ -144,7 +144,7 @@
 
             if ($scope.currentPage === $scope.numberOfPages - 1) {
               itemCountOnLastPage = $scope.list.length % $scope.itemsPerPage;
-              if (itemCountOnLastPage !== 0) {
+              if (itemCountOnLastPage !== 0 || $scope.list.length === 0) {
                 fillerLength = $scope.itemsPerPage - itemCountOnLastPage - 1;
                 _results = [];
                 for (x = _i = _ref = $scope.list.length, _ref1 = $scope.list.length + fillerLength; _ref <= _ref1 ? _i <= _ref1 : _i >= _ref1; x = _ref <= _ref1 ? ++_i : --_i) {
