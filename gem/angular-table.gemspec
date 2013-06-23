@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.summary       = spec.description
   spec.homepage      = "https://github.com/ssmm/angular-table"
   spec.license       = "MIT"
-  spec.files         = Dir["lib/**/*"] + Dir["vendor/**/*"]
+  spec.files         = Dir["lib/**/*"] + Dir["app/**/*"]
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 1.3"

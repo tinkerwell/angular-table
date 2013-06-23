@@ -9,7 +9,10 @@ task :compile do
 
   script = CoffeeScript.compile collect_coffees
 
-  File.open("angular-table.js", "w") { |file| file.write(prepend_author_notice(script)) }
+  prepend_author_notice(script)
+
+  File.open("angular-table.js", "w") { |file| file.write(script) }
+  File.open("gem/app/assets/javascripts/angular-table.js", "w") { |file| file.write(script) }
   File.open("angular-table.min.js", "w") { |file| file.write(prepend_author_notice(Uglifier.new.compile(script))) }
 
 end
@@ -18,7 +21,7 @@ def collect_coffees
   files = ["atTable", "atImplicit", "atPagination", "metaCollector", "setupFactory"]
   script = ""
   files.each do |file|
-    script << File.read("gem/vendor/assets/javascripts/#{file}.coffee") << "\n"
+    script << File.read("coffee/#{file}.coffee") << "\n"
   end
   script
 end
