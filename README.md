@@ -2,7 +2,7 @@
 
 Lets you declare sortable, pageable tables with minimal effort while providing high flexibilty.
 
-[Written in CoffeeScript.](https://github.com/ssmm/angular-table/blob/master/gem/vendor/assets/javascripts)
+[Written in CoffeeScript.](https://github.com/ssmm/angular-table/blob/master/coffee)
 
 Check out the [examples](http://ssmm.github.io/angular-table/examples.html) for more information.
 
